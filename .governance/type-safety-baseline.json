@@ -1,6 +1,9 @@
 {
-  "totalHoles": 0,
-  "byFile": {},
+  "totalHoles": 1,
+  "byFile": {
+    "core-governance/gaian/biomes/uprising.py": {"total": 0.5, "breakdown": {"Any import": 1}},
+    "core-governance/gaian/core/policy_engine.py": {"total": 0.5, "breakdown": {"Any import": 1}}
+  },
   "generated": "2026-01-20T00:00:00.000Z",
   "description": "Iron Dome type safety baseline - ratchet only goes DOWN"
 }

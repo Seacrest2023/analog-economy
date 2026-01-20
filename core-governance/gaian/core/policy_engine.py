@@ -7,14 +7,15 @@ and determines whether telemetry data should be accepted, flagged, or rejected.
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any
 from pathlib import Path
+from typing import Any
 
 import yaml
 
 
 class PolicyDecision(Enum):
     """Possible outcomes of policy evaluation."""
+
     ACCEPT = "accept"
     FLAG_FOR_REVIEW = "flag_for_review"
     REJECT = "reject"
@@ -24,6 +25,7 @@ class PolicyDecision(Enum):
 @dataclass
 class PolicyResult:
     """Result of a policy evaluation."""
+
     decision: PolicyDecision
     confidence: float
     reasons: list[str]
@@ -88,7 +90,7 @@ class PolicyEngine:
             decision=PolicyDecision.ACCEPT,
             confidence=1.0,
             reasons=reasons,
-            metadata={"biome": biome_id}
+            metadata={"biome": biome_id},
         )
 
     def get_biome_config(self, biome_id: str) -> dict[str, Any]:

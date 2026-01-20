@@ -9,7 +9,6 @@ Run with:
 """
 
 from contextlib import asynccontextmanager
-from datetime import datetime
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,7 +17,7 @@ from loguru import logger
 
 from gaian import __version__
 from gaian.config import settings
-from gaian.routes import health_router, action_router
+from gaian.routes import action_router, health_router
 
 
 @asynccontextmanager
@@ -122,7 +121,7 @@ async def global_exception_handler(request: Request, exc: Exception):
                 "error": "Internal Server Error",
                 "detail": str(exc),
                 "type": type(exc).__name__,
-            }
+            },
         )
     else:
         # In production, return generic error
@@ -131,7 +130,7 @@ async def global_exception_handler(request: Request, exc: Exception):
             content={
                 "error": "Internal Server Error",
                 "detail": "An unexpected error occurred",
-            }
+            },
         )
 
 

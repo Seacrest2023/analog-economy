@@ -16,6 +16,7 @@ Special Rules:
 """
 
 from typing import Any
+
 from .base_biome import BaseBiome
 
 
@@ -116,8 +117,8 @@ class UprisingBiome(BaseBiome):
                 "crowd_control",
                 "surveillance",
                 "targeting_systems",
-                "autonomous_weapons"
-            ]
+                "autonomous_weapons",
+            ],
         }
 
     def requires_human_review(self, record_count: int) -> bool:
