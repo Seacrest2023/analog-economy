@@ -108,7 +108,6 @@ jobs:
     name: "Layer 3: Mock Tax"
     runs-on: ubuntu-latest
     needs: [config-validation]
-    if: hashFiles('core-governance/tests/**/*.py') != ''
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -154,7 +153,6 @@ jobs:
     name: "Layer 10: Mock Conformance"
     runs-on: ubuntu-latest
     needs: [config-validation]
-    if: hashFiles('core-governance/tests/conftest.py') != ''
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -165,7 +163,12 @@ jobs:
           python-version: '3.11'
 
       - name: Run Mock Conformance check
-        run: python scripts/governance/python/check_mock_conformance.py
+        run: |
+          if [ -f "core-governance/tests/conftest.py" ]; then
+            python scripts/governance/python/check_mock_conformance.py
+          else
+            echo "No conftest.py found, skipping mock conformance check"
+          fi
 
   # ===========================================================================
   # SUPPLY CHAIN SECURITY (TypeScript)
@@ -173,7 +176,6 @@ jobs:
   supply-chain:
     name: "Supply Chain Security"
     runs-on: ubuntu-latest
-    if: hashFiles('web-portal/package.json') != ''
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -185,6 +187,10 @@ jobs:
 
       - name: Run supply chain check
         run: |
+          if [ ! -f "web-portal/package.json" ]; then
+            echo "No web-portal/package.json found, skipping supply chain check"
+            exit 0
+          fi
           if [ -f "scripts/governance/node/check_supply_chain.js" ]; then
             node scripts/governance/node/check_supply_chain.js
           else
