@@ -158,6 +158,74 @@ We strive for historical authenticity while allowing for engaging gameplay:
 
 ---
 
+## Git Workflow (MANDATORY)
+
+### The Branch-PR-Merge Rule
+
+**NEVER push directly to `master`.** All changes must go through a Pull Request.
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    THE ANALOG ECONOMY GIT WORKFLOW                   │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│   1. CREATE BRANCH                                                  │
+│      git checkout -b feature/my-feature                             │
+│        ↓                                                            │
+│   2. MAKE CHANGES                                                   │
+│      Write code, run pre-commit hooks locally                       │
+│        ↓                                                            │
+│   3. PUSH BRANCH                                                    │
+│      git push -u origin feature/my-feature                          │
+│        ↓                                                            │
+│   4. CREATE PR                                                      │
+│      gh pr create --title "feat: My feature" --body "..."           │
+│        ↓                                                            │
+│   5. CI RUNS                                                        │
+│      Governance CI validates the changes                            │
+│        ↓                                                            │
+│   6. HUMAN MERGES                                                   │
+│      The human reviews and merges the PR                            │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Branch Naming Convention
+
+| Type | Pattern | Example |
+|------|---------|---------|
+| Feature | `feature/short-description` | `feature/crafting-system` |
+| Bug fix | `fix/short-description` | `fix/login-timeout` |
+| Documentation | `docs/short-description` | `docs/api-reference` |
+| Refactor | `refactor/short-description` | `refactor/scoring-engine` |
+
+### Quick Reference
+
+```bash
+# Create feature branch
+git checkout -b feature/my-feature
+
+# Make changes, then commit
+git add -A && git commit -m "feat: Add my feature"
+
+# Push and create PR
+git push -u origin feature/my-feature
+gh pr create --title "feat: Add my feature" --body "Description here"
+
+# After human merges, clean up
+git checkout master && git pull
+git branch -d feature/my-feature
+```
+
+### Why PRs?
+
+1. **CI Validation** — Governance CI runs on every PR
+2. **Human Review** — The human maintains final control
+3. **Clean History** — Atomic, reviewable changes
+4. **Rollback Safety** — Easy to revert specific PRs
+
+---
+
 ## Working with This Codebase
 
 ### Before Making Changes
@@ -169,9 +237,11 @@ We strive for historical authenticity while allowing for engaging gameplay:
 
 ### When Adding Features
 
-1. **Document first** - Create or update the specification
-2. **Update the index** - Add to `story-index.md`
-3. **Then implement** - Code follows documentation
+1. **Create branch** — `git checkout -b feature/my-feature`
+2. **Document first** — Create or update the specification
+3. **Update the index** — Add to `story-index.md`
+4. **Implement** — Code follows documentation
+5. **Push and PR** — Let CI validate, human merges
 
 ### When Reviewing Content
 

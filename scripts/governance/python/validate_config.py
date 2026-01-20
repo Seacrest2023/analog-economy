@@ -70,7 +70,8 @@ def main():
     print("LAYER 0: Config File Validation")
     print("=" * 60)
 
-    root = Path(__file__).parent.parent.parent
+    # Go up 4 levels: python/ -> governance/ -> scripts/ -> repo root
+    root = Path(__file__).parent.parent.parent.parent
     errors = []
 
     # Python configs
