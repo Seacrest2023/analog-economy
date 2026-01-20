@@ -387,7 +387,7 @@ services:
     environment:
       - APP_ENV=development
       - APP_DEBUG=true
-      - DATABASE_URL=postgresql://gaian:gaian_dev_password@postgres:5432/analog_economy
+      - DATABASE_URL=postgresql://gaian:gaian_dev_password@postgres:5432/analog_economy  # pragma: allowlist secret
       - REDIS_URL=redis://redis:6379/0
       - QDRANT_HOST=qdrant
       - QDRANT_PORT=6333
