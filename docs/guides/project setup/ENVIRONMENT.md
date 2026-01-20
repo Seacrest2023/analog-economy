@@ -427,7 +427,7 @@ Store in player preferences, editable from settings menu.
 # .env (local development)
 APP_ENV=development
 APP_DEBUG=true
-DATABASE_URL=postgresql://gaian:gaian_dev_password@localhost:5432/analog_economy
+DATABASE_URL=postgresql://gaian:gaian_dev_password@localhost:5432/analog_economy  # pragma: allowlist secret
 SILA_MOCK_ENABLED=true
 ```
 
