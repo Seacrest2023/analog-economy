@@ -13,18 +13,13 @@ This endpoint is the "Golden Spike" proving the pipeline works.
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 from uuid import uuid4
 
 from fastapi import APIRouter, HTTPException, status
 from loguru import logger
 
 from gaian.config import settings
-from gaian.models.action import (
-    ActionRequest,
-    ActionResponse,
-    ActionType,
-)
+from gaian.models.action import ActionRequest, ActionResponse, ActionType
 
 router = APIRouter(prefix="/api/v1", tags=["Actions"])
 
@@ -157,10 +152,7 @@ async def process_action(request: ActionRequest) -> ActionResponse:
 
     # Validate action (basic validation for Phase 1)
     if not request.player_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="player_id is required"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="player_id is required")
 
     # Calculate reward
     sila_reward, quality_score, novelty_score = calculate_sila_reward(request)
@@ -204,9 +196,7 @@ async def list_action_types() -> dict[str, list[str]]:
 
     Useful for UE5 client to validate actions before sending.
     """
-    return {
-        "action_types": [action_type.value for action_type in ActionType]
-    }
+    return {"action_types": [action_type.value for action_type in ActionType]}
 
 
 @router.get(
@@ -223,8 +213,7 @@ async def list_action_rewards() -> dict[str, dict[str, float]]:
     """
     return {
         "base_rewards": {
-            action_type.value: reward
-            for action_type, reward in ACTION_REWARDS.items()
+            action_type.value: reward for action_type, reward in ACTION_REWARDS.items()
         },
-        "note": "Actual rewards vary based on quality, novelty, and karma multipliers"
+        "note": "Actual rewards vary based on quality, novelty, and karma multipliers",
     }
