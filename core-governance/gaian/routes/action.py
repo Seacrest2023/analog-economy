@@ -8,19 +8,25 @@ Every player action flows through here for:
 3. Training data capture
 
 This endpoint is the "Golden Spike" proving the pipeline works.
+
+Architecture Rules:
+- NEVER use datetime. ALWAYS use pendulum.
+- NEVER use json. ALWAYS use orjson.
+- NEVER use print or loguru. ALWAYS use structlog.
 """
 
-import json
-from datetime import datetime
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
+import orjson
+import pendulum
+import structlog
 from fastapi import APIRouter, HTTPException, status
-from loguru import logger
-
 from gaian.config import settings
 from gaian.models.action import ActionRequest, ActionResponse, ActionType
+
+logger = structlog.get_logger(__name__)
 
 router = APIRouter(prefix="/api/v1", tags=["Actions"])
 
@@ -114,12 +120,12 @@ def log_training_data(request: ActionRequest, response: ActionResponse) -> None:
         },
     }
 
-    # Append to JSONL file
-    log_file = training_path / f"actions_{datetime.utcnow().strftime('%Y%m%d')}.jsonl"
-    with open(log_file, "a", encoding="utf-8") as f:
-        f.write(json.dumps(training_record) + "\n")
+    # Append to JSONL file (using pendulum for timestamp, orjson for serialization)
+    log_file = training_path / f"actions_{pendulum.now('UTC').format('YYYYMMDD')}.jsonl"
+    with open(log_file, "ab") as f:  # orjson outputs bytes
+        f.write(orjson.dumps(training_record) + b"\n")
 
-    logger.debug(f"Training data logged: {response.training_data_id}")
+    logger.debug("training_data_logged", training_data_id=str(response.training_data_id))
 
 
 @router.post(
@@ -146,9 +152,10 @@ async def process_action(request: ActionRequest) -> ActionResponse:
     The core endpoint connecting UE5 client to Gaian governance.
     """
     logger.info(
-        f"Action received: {request.action.type.value} "
-        f"from player {request.player_id} "
-        f"in session {request.session_id}"
+        "action_received",
+        action_type=request.action.type.value,
+        player_id=request.player_id,
+        session_id=str(request.session_id),
     )
 
     # Validate action (basic validation for Phase 1)
@@ -173,14 +180,20 @@ async def process_action(request: ActionRequest) -> ActionResponse:
     try:
         log_training_data(request, response)
     except Exception as e:
-        logger.error(f"Failed to log training data: {e}")
+        logger.error(
+            "training_data_log_failed",
+            error=str(e),
+            action_type=request.action.type.value,
+        )
         # Don't fail the request if logging fails
         # Training data is important but not critical for gameplay
 
     logger.info(
-        f"Action processed: {request.action.type.value} "
-        f"-> {sila_reward} SILA "
-        f"(quality: {quality_score}, novelty: {novelty_score})"
+        "action_processed",
+        action_type=request.action.type.value,
+        sila_reward=sila_reward,
+        quality_score=quality_score,
+        novelty_score=novelty_score,
     )
 
     return response

@@ -3,15 +3,18 @@ Health Check Endpoints
 
 Provides health and readiness checks for container orchestration.
 Used by Docker health checks and Kubernetes probes.
+
+Architecture Rules:
+- NEVER use datetime. ALWAYS use pendulum.
+- NEVER use json. ALWAYS use orjson (ORJSONResponse).
 """
 
-from datetime import datetime
-
+import pendulum
 from fastapi import APIRouter, Response, status
-from pydantic import BaseModel
-
+from fastapi.responses import ORJSONResponse
 from gaian import __version__
 from gaian.config import settings
+from pydantic import AwareDatetime, BaseModel
 
 router = APIRouter(tags=["Health"])
 
@@ -22,7 +25,7 @@ class HealthResponse(BaseModel):
     status: str
     version: str
     environment: str
-    timestamp: datetime
+    timestamp: AwareDatetime
     checks: dict[str, bool]
 
 
@@ -36,6 +39,7 @@ class ReadinessResponse(BaseModel):
 @router.get(
     "/health",
     response_model=HealthResponse,
+    response_class=ORJSONResponse,
     summary="Health Check",
     description="Basic health check for container orchestration.",
 )
@@ -47,12 +51,14 @@ async def health_check() -> HealthResponse:
     - Docker HEALTHCHECK
     - Kubernetes livenessProbe
     - Load balancer health checks
+
+    Architecture: Uses pendulum.now("UTC") and ORJSONResponse.
     """
     return HealthResponse(
         status="healthy",
         version=__version__,
         environment=settings.app_env,
-        timestamp=datetime.utcnow(),
+        timestamp=pendulum.now("UTC"),
         checks={
             "service": True,
             "config": True,
