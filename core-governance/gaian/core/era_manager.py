@@ -12,6 +12,7 @@ from typing import Any
 
 class EraId(Enum):
     """Enumeration of playable eras."""
+
     ANCIENT = "ancient"
     CLASSICAL = "classical"
     MEDIEVAL = "medieval"
@@ -24,6 +25,7 @@ class EraId(Enum):
 
 class ProgressionMode(Enum):
     """How players can progress through eras."""
+
     CHRONOLOGICAL = "chronological"
     ERA_SELECT = "era_select"
     TIME_TRAVELER = "time_traveler"
@@ -33,6 +35,7 @@ class ProgressionMode(Enum):
 @dataclass
 class EraState:
     """Current era state for a player."""
+
     current_era: EraId
     progression_mode: ProgressionMode
     milestones_completed: list[str]
@@ -44,6 +47,7 @@ class EraState:
 @dataclass
 class EraTransitionResult:
     """Result of attempting era transition."""
+
     success: bool
     from_era: EraId
     to_era: EraId | None
@@ -95,7 +99,7 @@ class EraManager:
         self,
         player_id: str,
         mode: ProgressionMode = ProgressionMode.MODERN_START,
-        starting_era: EraId | None = None
+        starting_era: EraId | None = None,
     ) -> EraState:
         """
         Initialize a new player's era state.
@@ -129,11 +133,7 @@ class EraManager:
         self._player_states[player_id] = state
         return state
 
-    def record_milestone(
-        self,
-        player_id: str,
-        milestone_id: str
-    ) -> EraState:
+    def record_milestone(self, player_id: str, milestone_id: str) -> EraState:
         """
         Record a milestone completion and check transition eligibility.
 
@@ -155,21 +155,17 @@ class EraManager:
             )
 
         # Check if player can now transition
-        min_achievements = self.progression_config.get(
-            "transition_triggers", {}
-        ).get("minimum_achievements_per_era", 5)
-
-        current_achievements = state.era_achievements.get(
-            state.current_era.value, 0
+        min_achievements = self.progression_config.get("transition_triggers", {}).get(
+            "minimum_achievements_per_era", 5
         )
+
+        current_achievements = state.era_achievements.get(state.current_era.value, 0)
         state.can_transition = current_achievements >= min_achievements
 
         return state
 
     def attempt_transition(
-        self,
-        player_id: str,
-        player_inventory: list[str]
+        self, player_id: str, player_inventory: list[str]
     ) -> EraTransitionResult:
         """
         Attempt to transition player to the next era.

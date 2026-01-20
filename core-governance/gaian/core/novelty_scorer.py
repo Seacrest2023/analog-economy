@@ -12,6 +12,7 @@ from typing import Any
 @dataclass
 class NoveltyScore:
     """Result of novelty evaluation."""
+
     base_tokens: int
     multipliers_applied: dict[str, float]
     final_tokens: int
@@ -42,10 +43,7 @@ class NoveltyScorer:
         self._solution_history: dict[str, int] = {}
 
     def score(
-        self,
-        solution: dict[str, Any],
-        biome_config: dict[str, Any],
-        player_id: str
+        self, solution: dict[str, Any], biome_config: dict[str, Any], player_id: str
     ) -> NoveltyScore:
         """
         Calculate novelty score for a player solution.
@@ -58,8 +56,8 @@ class NoveltyScorer:
         Returns:
             NoveltyScore with token calculation breakdown
         """
-        multipliers_applied = {}
-        novelty_factors = []
+        multipliers_applied: dict[str, float] = {}
+        novelty_factors: list[str] = []
 
         # Start with baseline
         current_score = float(self.baseline_tokens)
@@ -103,7 +101,7 @@ class NoveltyScorer:
             multipliers_applied=multipliers_applied,
             final_tokens=final_tokens,
             novelty_factors=novelty_factors,
-            diminishing_returns_applied=diminishing_applied
+            diminishing_returns_applied=diminishing_applied,
         )
 
     def reset_history(self, player_id: str | None = None) -> None:

@@ -290,7 +290,7 @@ dpo_schema:
       reward_diff: 150
       user_id_chosen: "player_x_journeyman"
       user_id_rejected: "player_y_apprentice"
-      game_state_hash: "a1b2c3d4e5f6"
+      game_state_hash: "a1b2c3d4e5f6"  # pragma: allowlist secret
       ambiguity_score: 0.89
       karma_impact:
         chosen: -5  # Letting sick and children suffer

@@ -7,14 +7,15 @@ and determines whether telemetry data should be accepted, flagged, or rejected.
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any
 from pathlib import Path
+from typing import Any
 
 import yaml
 
 
 class PolicyDecision(Enum):
     """Possible outcomes of policy evaluation."""
+
     ACCEPT = "accept"
     FLAG_FOR_REVIEW = "flag_for_review"
     REJECT = "reject"
@@ -24,6 +25,7 @@ class PolicyDecision(Enum):
 @dataclass
 class PolicyResult:
     """Result of a policy evaluation."""
+
     decision: PolicyDecision
     confidence: float
     reasons: list[str]
@@ -53,7 +55,8 @@ class PolicyEngine:
 
         if config_path.exists():
             with open(config_path) as f:
-                return yaml.safe_load(f)
+                result = yaml.safe_load(f)
+                return result if isinstance(result, dict) else {}
 
         return {}
 
@@ -76,7 +79,7 @@ class PolicyEngine:
         if not self._initialized:
             self.initialize()
 
-        reasons = []
+        reasons: list[str] = []
 
         # TODO: Implement full policy evaluation chain
         # 1. Anti-cheat validation
@@ -88,10 +91,11 @@ class PolicyEngine:
             decision=PolicyDecision.ACCEPT,
             confidence=1.0,
             reasons=reasons,
-            metadata={"biome": biome_id}
+            metadata={"biome": biome_id},
         )
 
     def get_biome_config(self, biome_id: str) -> dict[str, Any]:
         """Get configuration for a specific biome."""
-        biomes = self.config.get("biomes", {})
-        return biomes.get(biome_id, {})
+        biomes: dict[str, Any] = self.config.get("biomes", {})
+        result = biomes.get(biome_id, {})
+        return result if isinstance(result, dict) else {}

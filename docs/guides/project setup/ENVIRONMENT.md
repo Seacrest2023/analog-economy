@@ -94,8 +94,8 @@ GAIAN_WORKERS=1
 # DATABASE (PostgreSQL)
 # =============================================================================
 
-# Connection string format: postgresql://user:password@host:port/database
-DATABASE_URL=postgresql://gaian:gaian_dev_password@localhost:5432/analog_economy
+# Connection string format: postgresql://user:password@host:port/database  # pragma: allowlist secret
+DATABASE_URL=postgresql://gaian:gaian_dev_password@localhost:5432/analog_economy  # pragma: allowlist secret
 
 # Connection pool settings
 DATABASE_POOL_SIZE=5
@@ -387,7 +387,7 @@ services:
     environment:
       - APP_ENV=development
       - APP_DEBUG=true
-      - DATABASE_URL=postgresql://gaian:gaian_dev_password@postgres:5432/analog_economy
+      - DATABASE_URL=postgresql://gaian:gaian_dev_password@postgres:5432/analog_economy  # pragma: allowlist secret
       - REDIS_URL=redis://redis:6379/0
       - QDRANT_HOST=qdrant
       - QDRANT_PORT=6333
@@ -427,7 +427,7 @@ Store in player preferences, editable from settings menu.
 # .env (local development)
 APP_ENV=development
 APP_DEBUG=true
-DATABASE_URL=postgresql://gaian:gaian_dev_password@localhost:5432/analog_economy
+DATABASE_URL=postgresql://gaian:gaian_dev_password@localhost:5432/analog_economy  # pragma: allowlist secret
 SILA_MOCK_ENABLED=true
 ```
 
@@ -437,7 +437,7 @@ SILA_MOCK_ENABLED=true
 # .env.staging
 APP_ENV=staging
 APP_DEBUG=false
-DATABASE_URL=postgresql://gaian:staging_password@staging-db.example.com:5432/analog_economy
+DATABASE_URL=postgresql://gaian:staging_password@staging-db.example.com:5432/analog_economy  # pragma: allowlist secret
 SILA_MOCK_ENABLED=true  # Still mock in staging
 ```
 

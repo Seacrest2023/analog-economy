@@ -6,7 +6,6 @@ Used by Docker health checks and Kubernetes probes.
 """
 
 from datetime import datetime
-from typing import Optional
 
 from fastapi import APIRouter, Response, status
 from pydantic import BaseModel
@@ -19,6 +18,7 @@ router = APIRouter(tags=["Health"])
 
 class HealthResponse(BaseModel):
     """Health check response."""
+
     status: str
     version: str
     environment: str
@@ -28,6 +28,7 @@ class HealthResponse(BaseModel):
 
 class ReadinessResponse(BaseModel):
     """Readiness check response."""
+
     ready: bool
     checks: dict[str, str]
 
@@ -55,7 +56,7 @@ async def health_check() -> HealthResponse:
         checks={
             "service": True,
             "config": True,
-        }
+        },
     )
 
 
@@ -110,10 +111,7 @@ async def readiness_check(response: Response) -> ReadinessResponse:
     if not all_ready:
         response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
 
-    return ReadinessResponse(
-        ready=all_ready,
-        checks=checks
-    )
+    return ReadinessResponse(ready=all_ready, checks=checks)
 
 
 @router.get(

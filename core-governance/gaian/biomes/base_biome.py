@@ -12,6 +12,7 @@ from typing import Any
 @dataclass
 class BiomeContext:
     """Context information for biome rule evaluation."""
+
     biome_id: str
     ethics_level: str  # "normal", "elevated", "high", "maximum"
     classification: str  # "STANDARD", "SENSITIVE", "RESTRICTED", "CRITICAL"
@@ -47,7 +48,7 @@ class BaseBiome(ABC):
             biome_id=self.biome_id,
             ethics_level=self.ethics_level,
             classification=self.classification,
-            special_rules=self.special_rules
+            special_rules=self.special_rules,
         )
 
     @abstractmethod
@@ -75,11 +76,13 @@ class BaseBiome(ABC):
 
     def get_novelty_weight(self) -> float:
         """Get novelty scoring weight for this biome."""
-        return self.config.get("novelty_weight", 1.0)
+        weight = self.config.get("novelty_weight", 1.0)
+        return float(weight) if isinstance(weight, int | float) else 1.0
 
     def requires_human_review(self, record_count: int) -> bool:
         """Check if exports from this biome require human review."""
-        threshold = self.config.get("additional_restrictions", {}).get(
-            "human_review_threshold", float("inf")
-        )
-        return record_count >= threshold
+        restrictions = self.config.get("additional_restrictions", {})
+        if not isinstance(restrictions, dict):
+            return False
+        threshold = restrictions.get("human_review_threshold", float("inf"))
+        return bool(record_count >= float(threshold))

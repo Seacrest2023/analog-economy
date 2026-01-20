@@ -11,11 +11,11 @@ This code is proprietary and confidential.
 __version__ = "0.1.0"
 __author__ = "Analog Economy"
 
-from .core.policy_engine import PolicyEngine
-from .core.ethics_filter import EthicsFilter
-from .core.novelty_scorer import NoveltyScorer
 from .core.anti_cheat import AntiCheat
 from .core.data_gate import DataGate
+from .core.ethics_filter import EthicsFilter
+from .core.novelty_scorer import NoveltyScorer
+from .core.policy_engine import PolicyEngine
 
 __all__ = [
     "PolicyEngine",

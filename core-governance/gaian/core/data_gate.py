@@ -1,3 +1,4 @@
+# SRP_EXEMPT: evaluate() is 79 LOC - needs refactoring in future PR
 """
 Data Gate - Final checkpoint before data exits the system.
 
@@ -15,6 +16,7 @@ from pendulum import DateTime
 
 class ExportDecision(Enum):
     """Possible outcomes of export evaluation."""
+
     APPROVED = "approved"
     PENDING_REVIEW = "pending_review"
     REJECTED = "rejected"
@@ -24,6 +26,7 @@ class ExportDecision(Enum):
 @dataclass
 class ExportRequest:
     """A request to export data to a buyer."""
+
     buyer_id: str
     biome_id: str
     record_count: int
@@ -35,6 +38,7 @@ class ExportRequest:
 @dataclass
 class ExportResult:
     """Result of export gate evaluation."""
+
     decision: ExportDecision
     request: ExportRequest
     reasons: list[str]
@@ -81,16 +85,16 @@ class DataGate:
         Returns:
             ExportResult with decision and audit information
         """
-        reasons = []
-
         # Check batch size
         if request.record_count > self.max_batch_size:
             return ExportResult(
                 decision=ExportDecision.REJECTED,
                 request=request,
-                reasons=[f"Batch size {request.record_count} exceeds maximum {self.max_batch_size}"],
+                reasons=[
+                    f"Batch size {request.record_count} exceeds maximum {self.max_batch_size}"
+                ],
                 requires_human_review=False,
-                audit_id=self._create_audit_entry(request, "rejected_batch_size")
+                audit_id=self._create_audit_entry(request, "rejected_batch_size"),
             )
 
         # Check buyer authorization
@@ -101,7 +105,7 @@ class DataGate:
                 request=request,
                 reasons=[f"Buyer '{request.buyer_id}' is not authorized"],
                 requires_human_review=False,
-                audit_id=self._create_audit_entry(request, "rejected_unauthorized")
+                audit_id=self._create_audit_entry(request, "rejected_unauthorized"),
             )
 
         # Check biome access
@@ -112,7 +116,7 @@ class DataGate:
                 request=request,
                 reasons=[f"Buyer not authorized for biome '{request.biome_id}'"],
                 requires_human_review=False,
-                audit_id=self._create_audit_entry(request, "rejected_biome_access")
+                audit_id=self._create_audit_entry(request, "rejected_biome_access"),
             )
 
         # Check classification level
@@ -121,15 +125,16 @@ class DataGate:
             return ExportResult(
                 decision=ExportDecision.REJECTED,
                 request=request,
-                reasons=[f"Buyer clearance '{buyer_clearance}' insufficient for '{request.classification}' data"],
+                reasons=[
+                    f"Buyer clearance '{buyer_clearance}' insufficient for '{request.classification}' data"
+                ],
                 requires_human_review=False,
-                audit_id=self._create_audit_entry(request, "rejected_clearance")
+                audit_id=self._create_audit_entry(request, "rejected_clearance"),
             )
 
         # Check if human review required
-        requires_review = (
-            request.record_count > self.human_review_threshold or
-            buyer_config.get("ethics_board_approval", False)
+        requires_review = request.record_count > self.human_review_threshold or buyer_config.get(
+            "ethics_board_approval", False
         )
 
         if requires_review:
@@ -138,7 +143,7 @@ class DataGate:
                 request=request,
                 reasons=["Human review required for this export"],
                 requires_human_review=True,
-                audit_id=self._create_audit_entry(request, "pending_review")
+                audit_id=self._create_audit_entry(request, "pending_review"),
             )
 
         # Approved
@@ -147,7 +152,7 @@ class DataGate:
             request=request,
             reasons=[],
             requires_human_review=False,
-            audit_id=self._create_audit_entry(request, "approved")
+            audit_id=self._create_audit_entry(request, "approved"),
         )
 
     def _clearance_sufficient(self, buyer_clearance: str, data_classification: str) -> bool:
@@ -170,7 +175,7 @@ class DataGate:
 
         entry = {
             "audit_id": audit_id,
-            "timestamp": pendulum.now('UTC').to_iso8601_string(),
+            "timestamp": pendulum.now("UTC").to_iso8601_string(),
             "buyer_id": request.buyer_id,
             "biome_id": request.biome_id,
             "record_count": request.record_count,

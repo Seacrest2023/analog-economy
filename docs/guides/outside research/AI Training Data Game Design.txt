@@ -107,7 +107,7 @@ JSON
    "reward_diff": 500,
    "user_id_chosen": "player_x_diamond_tier",
    "user_id_rejected": "player_y_bronze_tier",
-   "game_state_hash": "a1b2c3d4e5..." 
+   "game_state_hash": "a1b2c3d4e5..."
  }
 }
 
@@ -139,7 +139,7 @@ JSON
      "is_last": false,
      "is_terminal": false,
      "observation": {
-       "visual_embedding": "vec_768_float32_array...", 
+       "visual_embedding": "vec_768_float32_array...",
        "image_path": "s3://game-data/ep_7721/frame_12.jpg",
        "proprioception": {
          "hand_left_xyz": [0.45, 1.2, -0.3],
@@ -152,7 +152,7 @@ JSON
        "world_vector": [0.01, 0.00, -0.05],
        "rotation_delta": [0, 0, 1.57],
        "gripper_action": 1,
-       "action_tokens":  
+       "action_tokens":
      },
      "reward": 1.0,
      "discount": 0.99
@@ -236,7 +236,7 @@ graph TD
        G -->|Tokenization| H
        F -->|Quality Score| H
        H --> I{Competence Filter}
-       
+
        I -->|Success / High Reward| J
        I -->|Failure / High Entropy| K
    end

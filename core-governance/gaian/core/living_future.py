@@ -15,6 +15,7 @@ from pendulum import DateTime
 
 class EventCategory(Enum):
     """Categories for real-world events."""
+
     NATURAL_DISASTER = "natural_disaster"
     WATER_CRISIS = "water_crisis"
     FOOD_INSECURITY = "food_insecurity"
@@ -30,6 +31,7 @@ class EventCategory(Enum):
 
 class EventStatus(Enum):
     """Processing status for events."""
+
     PENDING = "pending"
     DELAYED = "delayed"
     IN_REVIEW = "in_review"
@@ -42,6 +44,7 @@ class EventStatus(Enum):
 @dataclass
 class WorldEvent:
     """Represents a real-world event for potential game integration."""
+
     event_id: str
     title: str
     description: str
@@ -58,6 +61,7 @@ class WorldEvent:
 @dataclass
 class ChallengeProposal:
     """Community-proposed challenge based on current events."""
+
     proposal_id: str
     event_id: str | None
     title: str
@@ -109,13 +113,11 @@ class LivingFutureManager:
         self.config = config
         self.lf_config = config.get("living_future", {})
 
-        self.standard_delay_days = (
-            self.lf_config.get("news_integration", {})
-            .get("delay_period_days", 14)
+        self.standard_delay_days = self.lf_config.get("news_integration", {}).get(
+            "delay_period_days", 14
         )
-        self.sensitive_delay_days = (
-            self.lf_config.get("news_integration", {})
-            .get("sensitive_event_delay_days", 90)
+        self.sensitive_delay_days = self.lf_config.get("news_integration", {}).get(
+            "sensitive_event_delay_days", 90
         )
 
         # Event storage
@@ -151,8 +153,16 @@ class LivingFutureManager:
         target_biomes = self.CATEGORY_BIOME_MAP.get(category, ["all"])
         if "all" in target_biomes:
             target_biomes = [
-                "abyss", "scorch", "ruins", "aqua", "botany",
-                "theater", "exodus", "brink", "vector", "uprising"
+                "abyss",
+                "scorch",
+                "ruins",
+                "aqua",
+                "botany",
+                "theater",
+                "exodus",
+                "brink",
+                "vector",
+                "uprising",
             ]
 
         event = WorldEvent(
@@ -200,11 +210,7 @@ class LivingFutureManager:
 
         # Check delay period
         now = pendulum.now("UTC")
-        delay_days = (
-            self.sensitive_delay_days
-            if event.is_sensitive
-            else self.standard_delay_days
-        )
+        delay_days = self.sensitive_delay_days if event.is_sensitive else self.standard_delay_days
 
         eligible_at = event.occurred_at.add(days=delay_days)
         if now < eligible_at:
@@ -234,12 +240,7 @@ class LivingFutureManager:
         event.status = EventStatus.IN_REVIEW
         return True
 
-    def complete_ethics_review(
-        self,
-        event_id: str,
-        approved: bool,
-        reviewer_notes: str
-    ) -> bool:
+    def complete_ethics_review(self, event_id: str, approved: bool, reviewer_notes: str) -> bool:
         """
         Complete ethics review for an event.
 
@@ -303,10 +304,7 @@ class LivingFutureManager:
         """
         proposal_id = f"PROP-{pendulum.now('UTC').format('YYYYMMDDHHmmss')}"
 
-        proposer_reward = (
-            self.lf_config.get("community_proposals", {})
-            .get("proposer_reward", 500)
-        )
+        proposer_reward = self.lf_config.get("community_proposals", {}).get("proposer_reward", 500)
 
         proposal = ChallengeProposal(
             proposal_id=proposal_id,
@@ -341,9 +339,8 @@ class LivingFutureManager:
         proposal.votes += votes
 
         # Check if threshold reached
-        voting_threshold = (
-            self.lf_config.get("community_proposals", {})
-            .get("voting_threshold", 1000)
+        voting_threshold = self.lf_config.get("community_proposals", {}).get(
+            "voting_threshold", 1000
         )
 
         if proposal.votes >= voting_threshold:
@@ -353,17 +350,14 @@ class LivingFutureManager:
 
     def get_active_events(self) -> list[WorldEvent]:
         """Get all currently live events."""
-        return [
-            event for event in self._events.values()
-            if event.status == EventStatus.LIVE
-        ]
+        return [event for event in self._events.values() if event.status == EventStatus.LIVE]
 
     def get_events_for_biome(self, biome_id: str) -> list[WorldEvent]:
         """Get all live events relevant to a specific biome."""
         return [
-            event for event in self._events.values()
-            if event.status == EventStatus.LIVE
-            and biome_id in event.target_biomes
+            event
+            for event in self._events.values()
+            if event.status == EventStatus.LIVE and biome_id in event.target_biomes
         ]
 
     def _is_blocked_event(self, title: str, description: str) -> bool:

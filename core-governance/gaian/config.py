@@ -6,7 +6,6 @@ Fails fast if required configuration is missing.
 """
 
 from functools import lru_cache
-from typing import Optional
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -33,8 +32,7 @@ class Settings(BaseSettings):
     app_env: str = Field(default="development", description="Environment name")
     app_debug: bool = Field(default=True, description="Debug mode")
     app_secret_key: str = Field(
-        default="dev-secret-change-in-production",
-        description="Secret key for signing"
+        default="dev-secret-change-in-production", description="Secret key for signing"
     )
 
     # -------------------------------------------------------------------------
@@ -48,35 +46,28 @@ class Settings(BaseSettings):
     # -------------------------------------------------------------------------
     # Database (Optional for Phase 1)
     # -------------------------------------------------------------------------
-    database_url: Optional[str] = Field(
-        default=None,
-        description="PostgreSQL connection string"
-    )
+    database_url: str | None = Field(default=None, description="PostgreSQL connection string")
     database_pool_size: int = Field(default=5, description="Connection pool size")
     database_max_overflow: int = Field(default=10, description="Max overflow")
 
     # -------------------------------------------------------------------------
     # Redis (Optional for Phase 1)
     # -------------------------------------------------------------------------
-    redis_url: str = Field(
-        default="redis://localhost:6379/0",
-        description="Redis URL"
-    )
-    redis_password: Optional[str] = Field(default=None, description="Redis password")
+    redis_url: str = Field(default="redis://localhost:6379/0", description="Redis URL")
+    redis_password: str | None = Field(default=None, description="Redis password")
 
     # -------------------------------------------------------------------------
     # Qdrant (Optional for Phase 1)
     # -------------------------------------------------------------------------
     qdrant_host: str = Field(default="localhost", description="Qdrant host")
     qdrant_port: int = Field(default=6333, description="Qdrant port")
-    qdrant_api_key: Optional[str] = Field(default=None, description="Qdrant API key")
+    qdrant_api_key: str | None = Field(default=None, description="Qdrant API key")
 
     # -------------------------------------------------------------------------
     # Training Data
     # -------------------------------------------------------------------------
     training_data_path: str = Field(
-        default="./data/training",
-        description="Training data directory"
+        default="./data/training", description="Training data directory"
     )
     training_log_format: str = Field(default="jsonl", description="Log format")
     training_batch_size: int = Field(default=100, description="Batch size")
@@ -92,7 +83,7 @@ class Settings(BaseSettings):
     # -------------------------------------------------------------------------
     cors_origins: str = Field(
         default="http://localhost:3000,http://localhost:8080",
-        description="CORS origins (comma-separated)"
+        description="CORS origins (comma-separated)",
     )
 
     # -------------------------------------------------------------------------

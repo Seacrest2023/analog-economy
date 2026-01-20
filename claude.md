@@ -513,6 +513,60 @@ pre-commit run --all-files
 
 ---
 
+## Gaian Protocol: The 6 Commandments
+
+### 1. The "Physics Over Policy" Rule
+
+**Context:** We use `pre-commit` hooks as a physics engine, not just a suggestion.
+
+- **Rule:** NEVER bypass pre-commit hooks (`git commit --no-verify`).
+- **Rule:** If a hook fails (e.g., `check_iron_dome.py`), you must fix the code, not disable the hook.
+- **Rule:** When adding a new governance script, you MUST add it to BOTH `.pre-commit-config.yaml` (Local) AND `.github/workflows/governance-ci.yml` (CI).
+
+### 2. The "Iron Dome" Integrity Rule
+
+**Context:** We observed an attempt to globally disable `warn_return_any` in `pyproject.toml` to fix a local error.
+
+- **Rule:** NEVER lower the quality baseline globally. Quality must only go UP (The Ratchet).
+- **Rule:** If a specific legacy module (e.g., `era_manager`) fails a strict check, use a **Scoped Override** (`[[tool.mypy.overrides]]`) or a specific `# type: ignore`.
+- **Rule:** NEVER add `F841` (unused variable) to the ignore list for `core/`. Logic bugs must not be silenced.
+
+### 3. The Hexagonal TDD Rule
+
+**Context:** To prevent "Test Tangling," we strictly separate Pure Core from Adapters.
+
+- **Rule:** Before writing a test, classify the code:
+  - **Pure Core (Hexagon):** Does it import I/O? If NO -> Write a Unit Test that mocks **nothing**.
+  - **Adapter (Edge):** Does it touch DB/API? If YES -> Write an Integration Test using `TestClient` or `Gold Standard` mocks.
+- **Rule:** `core/` code is FORBIDDEN from importing `api/` or `database/` code. Enforce this via `import-linter`.
+
+### 4. The Secret Hygiene Rule
+
+**Context:** We rejected the use of `# pragma: allowlist secret` for config files.
+
+- **Rule:** NEVER commit a file containing a real secret, even with a pragma suppression.
+- **Rule:** Use the **Two-File Pattern**:
+  - Commit `.env.example` (Safe placeholders).
+  - Git-ignore `.env` (Real secrets).
+  - Load via `pydantic-settings`.
+
+### 5. The "Native Governance" Rule
+
+**Context:** We established that Python governs Python, and Node governs Node.
+
+- **Rule:** Do not write Node.js scripts to check Python AST.
+- **Rule:** Use `scripts/governance/python/*.py` for Backend checks and `scripts/governance/node/*.js` for Web checks.
+- **Rule:** Ensure `.pre-commit-config.yaml` routes the right file extensions to the right script language.
+
+### 6. The "Gaian Specificity" Rule
+
+**Context:** We had to rewrite docs because they referenced "VS Code Extension" instead of "Unreal Engine".
+
+- **Rule:** When generating documentation or scaffolding, you must tailor it to the **Analog Economy Stack** (Python FastAPI + Unreal Engine 5).
+- **Rule:** Do not copy generic "Mault" templates (TypeScript/VS Code) without performing a "Search & Replace" for our actual tools (`pytest`, `Pydantic`, `clang-format`).
+
+---
+
 ## Key Documentation
 
 | Document | Purpose |
