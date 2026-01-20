@@ -130,16 +130,7 @@ repos:
       - id: mypy
         files: ^core-governance/gaian/
         # Exclude legacy files until they have proper type annotations
-        exclude: |
-          (?x)^(
-            core-governance/gaian/core/novelty_scorer\.py|
-            core-governance/gaian/core/ethics_filter\.py|
-            core-governance/gaian/core/anti_cheat\.py|
-            core-governance/gaian/core/policy_engine\.py|
-            core-governance/gaian/core/era_manager\.py|
-            core-governance/gaian/routes/action\.py|
-            core-governance/gaian/biomes/base_biome\.py
-          )$
+        exclude: ^core-governance/gaian/(core/(novelty_scorer|ethics_filter|anti_cheat|policy_engine|era_manager)\.py|routes/action\.py|biomes/base_biome\.py)$
         args: [--ignore-missing-imports, --no-strict-optional]
         additional_dependencies:
           - types-requests
