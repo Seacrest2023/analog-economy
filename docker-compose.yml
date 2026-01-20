@@ -56,7 +56,7 @@ services:
     container_name: analog-postgres
     environment:
       POSTGRES_USER: gaian
-      POSTGRES_PASSWORD: gaian_dev_password
+      POSTGRES_PASSWORD: gaian_dev_password  # pragma: allowlist secret
       POSTGRES_DB: analog_economy
     ports:
       - "5432:5432"
