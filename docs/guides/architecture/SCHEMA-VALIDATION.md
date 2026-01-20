@@ -102,7 +102,7 @@ class SafeUser(BaseModel):
     email: str
 
 # What happens:
-data = {"id": "1", "email": "a@b.com", "password": "secret123"}
+data = {"id": "1", "email": "a@b.com", "password": "secret123"}  # pragma: allowlist secret
 
 UnsafeUser.model_validate(data)  # ✅ Passes silently, ignores password
 SafeUser.model_validate(data)    # ❌ Raises: extra fields not permitted

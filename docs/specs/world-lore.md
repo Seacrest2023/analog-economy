@@ -850,7 +850,7 @@ known_sacred_sites:
         - "Ancient foundations (older than the city)"
         - "Inner sanctum with strange acoustics"
       access: "Temple favor 25+"
-      secrets: "Contains entrance to deeper level"
+      secrets: "Contains entrance to deeper level"  # pragma: allowlist secret
 
     e_kur:  # Nippur
       description: "Mountain House, Temple of Enlil"
@@ -859,7 +859,7 @@ known_sacred_sites:
         - "Storm observation chamber"
         - "The Tablet of Destinies (legendary)"
       access: "Temple favor 50+"
-      secrets: "Records of the flood"
+      secrets: "Records of the flood"  # pragma: allowlist secret
 
     e_anna:  # Uruk
       description: "House of Heaven, Temple of Inanna"

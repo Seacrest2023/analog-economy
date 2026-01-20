@@ -94,8 +94,8 @@ GAIAN_WORKERS=1
 # DATABASE (PostgreSQL)
 # =============================================================================
 
-# Connection string format: postgresql://user:password@host:port/database
-DATABASE_URL=postgresql://gaian:gaian_dev_password@localhost:5432/analog_economy
+# Connection string format: postgresql://user:password@host:port/database  # pragma: allowlist secret
+DATABASE_URL=postgresql://gaian:gaian_dev_password@localhost:5432/analog_economy  # pragma: allowlist secret
 
 # Connection pool settings
 DATABASE_POOL_SIZE=5
@@ -437,7 +437,7 @@ SILA_MOCK_ENABLED=true
 # .env.staging
 APP_ENV=staging
 APP_DEBUG=false
-DATABASE_URL=postgresql://gaian:staging_password@staging-db.example.com:5432/analog_economy
+DATABASE_URL=postgresql://gaian:staging_password@staging-db.example.com:5432/analog_economy  # pragma: allowlist secret
 SILA_MOCK_ENABLED=true  # Still mock in staging
 ```
 
