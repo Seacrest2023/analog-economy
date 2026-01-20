@@ -55,8 +55,10 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
 
-      - name: Install pre-commit
-        run: pip install pre-commit
+      - name: Install pre-commit and mypy dependencies
+        run: |
+          pip install pre-commit
+          pip install mypy types-requests types-PyYAML pydantic pendulum
 
       - name: Run pre-commit on all files
         run: pre-commit run --all-files --show-diff-on-failure

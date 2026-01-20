@@ -122,20 +122,22 @@ repos:
         args: [--fix, --exit-non-zero-on-fix]
 
   # ---------------------------------------------------------------------------
-  # LAYER 7: STATIC TYPE CHECKER (mypy)
+  # LAYER 7: STATIC TYPE CHECKER (System-Aware mypy)
   # ---------------------------------------------------------------------------
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.10.0
+  # Uses system mypy to access project dependencies and properly detect
+  # implicit Any returns that mirrors-mypy misses in sandbox mode.
+  - repo: local
     hooks:
       - id: mypy
+        name: "Mypy (Type Check)"
+        entry: python -m mypy
+        language: system
+        types: [python]
         files: ^core-governance/gaian/
         # Exclude legacy files until they have proper type annotations
         exclude: ^core-governance/gaian/(core/(novelty_scorer|ethics_filter|anti_cheat|policy_engine|era_manager)\.py|routes/action\.py|biomes/base_biome\.py)$
-        args: [--ignore-missing-imports, --no-strict-optional]
-        additional_dependencies:
-          - types-requests
-          - types-PyYAML
-          - pydantic
+        args: ["--config-file=pyproject.toml", "--explicit-package-bases"]
+        require_serial: true
 
   # ---------------------------------------------------------------------------
   # LAYER 8: SECRET DETECTION
