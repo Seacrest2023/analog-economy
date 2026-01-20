@@ -1,0 +1,272 @@
+# Mault Memory Layer Configuration v1
+# Analog Economy Project Rulebook
+# NOTE: Mault governs Python & TypeScript only. C++ and Solidity require custom tooling.
+
+version: 1
+
+conventions:
+  directories:
+    # ===== CORE GOVERNANCE (Python) =====
+    - pattern: "core-governance/app/api/**/*.py"
+      location: "core-governance/app/api/"
+    - pattern: "core-governance/app/api/v1/**/*.py"
+      location: "core-governance/app/api/v1/"
+    - pattern: "core-governance/app/api/internal/**/*.py"
+      location: "core-governance/app/api/internal/"
+    - pattern: "core-governance/app/services/**/*.py"
+      location: "core-governance/app/services/"
+    - pattern: "core-governance/app/schemas/**/*.py"
+      location: "core-governance/app/schemas/"
+    - pattern: "core-governance/app/models/**/*.py"
+      location: "core-governance/app/models/"
+    - pattern: "core-governance/app/config/**/*.py"
+      location: "core-governance/app/config/"
+    - pattern: "core-governance/tests/test_*.py"
+      location: "core-governance/tests/"
+
+    # ===== GAIAN ENGINE (Python) =====
+    - pattern: "core-governance/gaian/core/**/*.py"
+      location: "core-governance/gaian/core/"
+    - pattern: "core-governance/gaian/biomes/**/*.py"
+      location: "core-governance/gaian/biomes/"
+    - pattern: "core-governance/gaian/exports/**/*.py"
+      location: "core-governance/gaian/exports/"
+
+    # ===== ML PIPELINE (Python) =====
+    - pattern: "core-governance/ml_pipeline/ingest/**/*.py"
+      location: "core-governance/ml_pipeline/ingest/"
+    - pattern: "core-governance/ml_pipeline/processors/**/*.py"
+      location: "core-governance/ml_pipeline/processors/"
+    - pattern: "core-governance/ml_pipeline/exports/**/*.py"
+      location: "core-governance/ml_pipeline/exports/"
+
+    # ===== SHARED SCHEMAS (Python) =====
+    - pattern: "shared/schemas/*.py"
+      location: "shared/schemas/"
+    - pattern: "shared/constants/*.py"
+      location: "shared/constants/"
+
+    # ===== WEB PORTAL (TypeScript) =====
+    - pattern: "web-portal/src/components/**/*.tsx"
+      location: "web-portal/src/components/"
+    - pattern: "web-portal/src/components/**/*.ts"
+      location: "web-portal/src/components/"
+    - pattern: "web-portal/src/pages/**/*.tsx"
+      location: "web-portal/src/pages/"
+    - pattern: "web-portal/src/services/**/*.ts"
+      location: "web-portal/src/services/"
+    - pattern: "web-portal/src/utils/**/*.ts"
+      location: "web-portal/src/utils/"
+    - pattern: "web-portal/src/types/**/*.ts"
+      location: "web-portal/src/types/"
+    - pattern: "web-portal/tests/**/*.test.ts"
+      location: "web-portal/tests/"
+    - pattern: "web-portal/tests/**/*.test.tsx"
+      location: "web-portal/tests/"
+
+    # ===== ADMIN TOOLS (TypeScript) =====
+    - pattern: "admin-tools/ethics-review/src/**/*.ts"
+      location: "admin-tools/ethics-review/src/"
+    - pattern: "admin-tools/ethics-review/src/**/*.tsx"
+      location: "admin-tools/ethics-review/src/"
+    - pattern: "admin-tools/analytics-dashboard/src/**/*.ts"
+      location: "admin-tools/analytics-dashboard/src/"
+    - pattern: "admin-tools/analytics-dashboard/src/**/*.tsx"
+      location: "admin-tools/analytics-dashboard/src/"
+    - pattern: "admin-tools/buyer-portal/src/**/*.ts"
+      location: "admin-tools/buyer-portal/src/"
+    - pattern: "admin-tools/buyer-portal/src/**/*.tsx"
+      location: "admin-tools/buyer-portal/src/"
+
+    # ===== INTEGRATION TESTS =====
+    - pattern: "tests/integration/**/*.py"
+      location: "tests/integration/"
+    - pattern: "tests/e2e/**/*.ts"
+      location: "tests/e2e/"
+
+  naming:
+    # Python conventions
+    - filePattern: "*.py"
+      className: "PascalCase"
+      functionName: "snake_case"
+      variableName: "snake_case"
+      constantName: "SCREAMING_SNAKE_CASE"
+    - filePattern: "*_service.py"
+      className: "PascalCase"
+      suffix: "Service"
+    - filePattern: "*_schema.py"
+      className: "PascalCase"
+      suffix: "Schema"
+    - filePattern: "test_*.py"
+      functionName: "snake_case"
+      prefix: "test_"
+
+    # TypeScript conventions
+    - filePattern: "*.ts"
+      className: "PascalCase"
+      functionName: "camelCase"
+      variableName: "camelCase"
+      constantName: "SCREAMING_SNAKE_CASE"
+    - filePattern: "*.tsx"
+      className: "PascalCase"
+      componentName: "PascalCase"
+    - filePattern: "*_service.ts"
+      className: "PascalCase"
+      suffix: "Service"
+    - filePattern: "*.test.ts"
+      functionName: "camelCase"
+
+deprecatedPatterns:
+  # Python - Enforce project standards
+  - import: "requests"
+    message: "Use httpx for async HTTP requests in this project."
+  - functionCall: "print("
+    message: "Use structured logging via loguru instead of print statements."
+  - import: "json"
+    message: "Use orjson for faster JSON serialization where performance matters."
+  - import: "datetime"
+    message: "Use pendulum for timezone-aware datetime handling."
+
+  # TypeScript - Enforce project standards
+  - import: "axios"
+    message: "Use the internal api_client.ts service for all API calls."
+  - functionCall: "console.log"
+    message: "Use the logging service for production code."
+  - import: "moment"
+    message: "Use date-fns for date manipulation."
+  - functionCall: "fetch("
+    message: "Use the api_client.ts service for consistent error handling."
+
+  # Security - Prevent common vulnerabilities
+  - functionCall: "eval("
+    message: "eval() is a security risk. Find an alternative approach."
+  - functionCall: "exec("
+    message: "exec() is a security risk. Find an alternative approach."
+  - import: "pickle"
+    message: "pickle is insecure for untrusted data. Use JSON or msgpack."
+
+environment:
+  apiPort: 8000
+  shell: "powershell"
+  pythonVersion: "3.11"
+  nodeVersion: "20"
+
+applicationFlows:
+  - id: telemetry-ingestion
+    title: "Telemetry Ingestion Flow"
+    description: "Game client sends player actions to governance layer"
+    files:
+      - "core-governance/app/api/v1/telemetry.py"
+      - "core-governance/app/services/telemetry_service.py"
+      - "core-governance/gaian/core/anti_cheat.py"
+      - "core-governance/ml_pipeline/ingest/raw_receiver.py"
+
+  - id: ethics-evaluation
+    title: "Ethics Evaluation Flow"
+    description: "Gaian evaluates telemetry against ethical boundaries"
+    files:
+      - "core-governance/gaian/core/policy_engine.py"
+      - "core-governance/gaian/core/ethics_filter.py"
+      - "core-governance/gaian/biomes/uprising.py"
+      - "core-governance/gaian/biomes/theater.py"
+      - "core-governance/gaian/biomes/vector.py"
+
+  - id: novelty-scoring
+    title: "Novelty Scoring & Payout Flow"
+    description: "Calculate token rewards for novel player solutions"
+    files:
+      - "core-governance/gaian/core/novelty_scorer.py"
+      - "core-governance/app/services/payout_calculator.py"
+      - "core-governance/app/api/v1/payouts.py"
+
+  - id: data-export
+    title: "Buyer Data Export Flow"
+    description: "Package and deliver training data to enterprise buyers"
+    files:
+      - "core-governance/gaian/core/data_gate.py"
+      - "core-governance/gaian/exports/buyer_packages.py"
+      - "core-governance/ml_pipeline/exports/dataset_builder.py"
+      - "core-governance/app/api/v1/exports.py"
+
+  - id: player-dashboard
+    title: "Player Dashboard Flow"
+    description: "Player views wallet, inventory, and earnings"
+    files:
+      - "web-portal/src/pages/dashboard.tsx"
+      - "web-portal/src/services/api_client.ts"
+      - "web-portal/src/services/wallet_service.ts"
+
+  - id: ethics-review
+    title: "Human Ethics Review Flow"
+    description: "Admin reviews flagged content for ethics violations"
+    files:
+      - "core-governance/app/api/internal/review.py"
+      - "admin-tools/ethics-review/src/index.tsx"
+
+Detectors:
+  flatArchitecture:
+    enabled: true
+    targets:
+      # Core Governance App Layer
+      - path: "core-governance/app"
+        minSubdirs: 4
+        maxRootFiles: 3
+        rootFileRatioThreshold: 0.10
+        expectedLayerNames: ["api", "services", "schemas", "models", "config"]
+        excludePatterns: ["**/__pycache__/**", "**/*.pyc"]
+
+      # Gaian Engine
+      - path: "core-governance/gaian"
+        minSubdirs: 3
+        maxRootFiles: 2
+        rootFileRatioThreshold: 0.15
+        expectedLayerNames: ["core", "biomes", "exports"]
+        excludePatterns: ["**/__pycache__/**"]
+
+      # ML Pipeline
+      - path: "core-governance/ml_pipeline"
+        minSubdirs: 3
+        maxRootFiles: 2
+        rootFileRatioThreshold: 0.15
+        expectedLayerNames: ["ingest", "processors", "exports"]
+        excludePatterns: ["**/__pycache__/**"]
+
+      # Web Portal
+      - path: "web-portal/src"
+        minSubdirs: 4
+        maxRootFiles: 5
+        rootFileRatioThreshold: 0.15
+        expectedLayerNames: ["components", "pages", "services", "utils", "types"]
+        excludePatterns: ["dist/**", "node_modules/**", "**/*.test.ts", "**/*.test.tsx"]
+
+      # Shared Schemas
+      - path: "shared"
+        minSubdirs: 2
+        maxRootFiles: 2
+        rootFileRatioThreshold: 0.20
+        expectedLayerNames: ["schemas", "constants"]
+        excludePatterns: []
+
+      # Admin Tools
+      - path: "admin-tools"
+        minSubdirs: 3
+        maxRootFiles: 2
+        rootFileRatioThreshold: 0.10
+        expectedLayerNames: ["ethics-review", "analytics-dashboard", "buyer-portal"]
+        excludePatterns: ["node_modules/**", "dist/**"]
+
+    scoring:
+      high: 0.9
+      medium: 0.8
+      low: 0.7
+
+    finding:
+      scenario: "flat-architecture"
+      defaultAction: "standardize"
+      safetyLevel: "safe"
+
+  environmentReinforcement:
+    enabled: true
+    scanMode: "go-forward"
+    # Cross-platform command detection
+    # Set to "full" when debugging platform-specific issues

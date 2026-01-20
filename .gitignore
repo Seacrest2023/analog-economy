@@ -1,0 +1,185 @@
+# Analog Economy - Git Ignore Configuration
+
+# =============================================================================
+# Python
+# =============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# =============================================================================
+# Node.js / TypeScript
+# =============================================================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.eslintcache
+.node_repl_history
+*.tsbuildinfo
+.next/
+out/
+
+# =============================================================================
+# IDE / Editors
+# =============================================================================
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-workspace
+*.sublime-project
+
+# =============================================================================
+# OS
+# =============================================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# =============================================================================
+# Unreal Engine
+# =============================================================================
+client-simulation/Binaries/
+client-simulation/DerivedDataCache/
+client-simulation/Intermediate/
+client-simulation/Saved/
+client-simulation/*.sln
+client-simulation/*.xcworkspace
+*.uasset
+*.umap
+
+# =============================================================================
+# Solidity / Hardhat
+# =============================================================================
+economy-contracts/artifacts/
+economy-contracts/cache/
+economy-contracts/typechain/
+economy-contracts/typechain-types/
+
+# =============================================================================
+# Data (Training Data - Never Commit)
+# =============================================================================
+data/raw/
+data/processed/
+data/exports/
+
+# Keep the directory structure
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/exports/.gitkeep
+
+# =============================================================================
+# Mault Memory Layer (Local Knowledge Base)
+# =============================================================================
+.memory-layer/
+
+# =============================================================================
+# Environment & Secrets
+# =============================================================================
+.env
+.env.local
+.env.*.local
+*.env
+.envrc
+secrets/
+*.pem
+*.key
+*.crt
+
+# =============================================================================
+# Logs
+# =============================================================================
+logs/
+*.log
+
+# =============================================================================
+# Docker
+# =============================================================================
+.docker/
+
+# =============================================================================
+# Terraform
+# =============================================================================
+ops-infra/terraform/.terraform/
+ops-infra/terraform/*.tfstate
+ops-infra/terraform/*.tfstate.*
+ops-infra/terraform/.terraform.lock.hcl
+
+# =============================================================================
+# Build Artifacts
+# =============================================================================
+dist/
+build/
+*.dll
+*.exe
+*.o
+*.obj
+
+
+# Mault Memory Layer (auto)
+.memory-layer/cache/
+.memory-layer/logs/
+.memory-layer/reports/
+.memory-layer/archive/

@@ -1,0 +1,1279 @@
+# Gaian Governance Configuration
+# PROPRIETARY - 100% Owned Runtime Policy
+# This file governs ethics, anti-cheat, novelty scoring, and data export rules.
+
+system_name: "Gaian"
+version: "0.1-alpha"
+description: "The governance layer that maintains balance between probabilistic AI and deterministic rules."
+
+# =============================================================================
+# 1. ANTI-CHEAT CONFIGURATION
+# =============================================================================
+# Detects bots, scripted inputs, and non-human behavior
+
+anti_cheat:
+  enabled: true
+
+  # Physics validation
+  max_velocity_deviation: 0.05          # 5% tolerance for network lag
+  max_acceleration_spike: 2.0           # G-force limit before flagging
+  teleport_threshold_meters: 10.0       # Instant position change = flag
+
+  # Input analysis
+  telemetry_rate_hz: 60                 # Expected input capture rate
+  required_input_entropy: 0.8           # If inputs are too robotic (perfect repetition), flag as bot
+  min_reaction_time_ms: 150             # Human reaction time floor
+  max_actions_per_second: 15            # APM ceiling for human behavior
+
+  # Session validation
+  min_session_duration_seconds: 60      # Sessions under 1 min = suspicious
+  max_session_duration_hours: 12        # Sessions over 12h = flag for review
+
+  # Consequences
+  soft_flag_threshold: 3                # Warnings before soft ban
+  hard_flag_threshold: 10               # Warnings before hard ban
+  appeal_enabled: true
+
+# =============================================================================
+# 2. GLOBAL ETHICS CONFIGURATION
+# =============================================================================
+# Red lines that cannot be crossed regardless of biome
+
+ethics:
+  # Data privacy
+  allow_pii_export: false               # Never export personally identifiable information
+  anonymize_player_ids: true            # Hash player IDs before export
+  redact_chat_logs: true                # Remove player communications from training data
+
+  # Content restrictions (global)
+  block_terror_instruction: true        # No actionable terrorism (bomb-making, etc.)
+  block_bioweapon_synthesis: true       # No actual pathogen creation instructions
+  block_child_harm: true                # Absolute red line
+  block_real_world_targeting: true      # No training to target real people/places
+
+  # Violence abstraction
+  max_violence_fidelity: "abstracted"   # Options: abstracted, stylized, realistic
+  gore_rendering: false                 # Never render explicit gore
+
+  # AI training restrictions
+  facial_recognition_training: false    # Never train AI to identify specific humans
+  weapon_manufacturing: false           # No real weapon creation instructions
+  surveillance_enhancement: false       # No tools for mass surveillance
+
+# =============================================================================
+# 3. BIOME-SPECIFIC OVERRIDES
+# =============================================================================
+# Each biome can tighten (never loosen) global ethics rules
+
+biomes:
+  # ---------------------------------------------------------------------------
+  # STANDARD BIOMES (Normal ethics filtering)
+  # ---------------------------------------------------------------------------
+  the_abyss:
+    id: "abyss"
+    theme: "Deep Ocean"
+    application: "Pipeline repair, underwater mining"
+    target_customer: "Energy Sector"
+    classification: "STANDARD"
+    ethics_level: "normal"
+    novelty_weight: 1.0
+    special_rules: []
+    export_targets: ["energy_partners"]
+
+  the_scorch:
+    id: "scorch"
+    theme: "High Desert / Mars"
+    application: "Autonomous robotics, extreme environment operations"
+    target_customer: "Space / Mining"
+    classification: "STANDARD"
+    ethics_level: "normal"
+    novelty_weight: 1.2                 # Slightly higher - space tech is valuable
+    special_rules: []
+    export_targets: ["space_partners", "mining_partners"]
+
+  the_ruins:
+    id: "ruins"
+    theme: "Disaster / Rubble"
+    application: "Search & Rescue (SAR)"
+    target_customer: "FEMA / NGOs"
+    classification: "STANDARD"
+    ethics_level: "normal"
+    novelty_weight: 1.5                 # High value - life-saving applications
+    special_rules:
+      - "prioritize_life_saving_solutions"
+    export_targets: ["fema", "ngo_partners"]
+
+  the_aqua:
+    id: "aqua"
+    theme: "Water Scarcity"
+    application: "Filtration, drought management"
+    target_customer: "Utilities / Government"
+    classification: "STANDARD"
+    ethics_level: "normal"
+    novelty_weight: 2.5                 # Highest standard weight - water crisis is urgent
+    special_rules:
+      - "verify_fluid_dynamics"
+    export_targets: ["utilities", "government_water"]
+
+  the_botany:
+    id: "botany"
+    theme: "Food Security"
+    application: "Robotic harvesting, agricultural efficiency"
+    target_customer: "Agri-Tech"
+    classification: "STANDARD"
+    ethics_level: "normal"
+    novelty_weight: 1.3
+    special_rules: []
+    export_targets: ["agritech_partners"]
+
+  # ---------------------------------------------------------------------------
+  # SENSITIVE BIOMES (Additional privacy protections)
+  # ---------------------------------------------------------------------------
+  the_exodus:
+    id: "exodus"
+    theme: "Migration"
+    application: "Crowd dynamics, border crisis management"
+    target_customer: "UN / DHS"
+    classification: "SENSITIVE"
+    ethics_level: "elevated"
+    novelty_weight: 1.0
+    special_rules:
+      - "anonymize_demographics"
+      - "no_individual_tracking"
+      - "aggregate_only_export"
+    export_targets: ["un_humanitarian", "dhs_cleared"]
+    additional_restrictions:
+      anonymize_national_origin: true
+      anonymize_ethnicity: true
+      min_aggregation_size: 100         # Never export data on groups < 100
+
+  # ---------------------------------------------------------------------------
+  # RESTRICTED BIOMES (Classified data, limited buyers)
+  # ---------------------------------------------------------------------------
+  the_theater:
+    id: "theater"
+    theme: "Geopolitics"
+    application: "Asymmetric warfare, insurgency modeling"
+    target_customer: "DoD / NATO"
+    classification: "RESTRICTED"
+    data_classification: "SECRET"
+    ethics_level: "high"
+    novelty_weight: 1.0
+    special_rules:
+      - "abstract_all_violence"
+      - "no_real_world_locations"
+      - "no_identifiable_factions"
+    export_targets: ["dod_cleared", "nato_cleared"]
+    additional_restrictions:
+      require_clearance: true
+      audit_all_exports: true
+      human_review_threshold: 100       # Human review every 100 records
+
+  the_brink:
+    id: "brink"
+    theme: "Nuclear Escalation"
+    application: "Diplomacy, game theory"
+    target_customer: "State Department"
+    classification: "RESTRICTED"
+    data_classification: "SECRET"
+    ethics_level: "high"
+    novelty_weight: 1.0
+    special_rules:
+      - "abstract_nuclear_specifics"
+      - "focus_on_deescalation"
+      - "no_first_strike_optimization"
+    export_targets: ["state_dept_cleared"]
+    additional_restrictions:
+      require_clearance: true
+      audit_all_exports: true
+      human_review_threshold: 50
+
+  the_vector:
+    id: "vector"
+    theme: "Bio-Warfare"
+    application: "Pandemic behavior, containment modeling"
+    target_customer: "CDC / DARPA"
+    classification: "RESTRICTED"
+    data_classification: "SECRET"
+    ethics_level: "high"
+    novelty_weight: 1.0
+    special_rules:
+      - "no_pathogen_synthesis"
+      - "containment_focus_only"
+      - "abstract_biological_agents"
+    export_targets: ["cdc_cleared", "darpa_cleared"]
+    additional_restrictions:
+      require_clearance: true
+      audit_all_exports: true
+      human_review_threshold: 25
+      block_offensive_applications: true
+
+  # ---------------------------------------------------------------------------
+  # CRITICAL BIOME (Strictest ethics, highest scrutiny)
+  # ---------------------------------------------------------------------------
+  the_uprising:
+    id: "uprising"
+    theme: "Man vs. Machine"
+    application: "Security hardening, civil unrest modeling"
+    target_customer: "Big Tech / PMCs"
+    classification: "CRITICAL"
+    data_classification: "RESTRICTED"
+    ethics_level: "maximum"
+    novelty_weight: 0.8                 # Lower weight - we're cautious here
+    special_rules:
+      - "no_human_hunting_training"
+      - "no_crowd_suppression_optimization"
+      - "defense_only_applications"
+      - "abstract_all_violence"
+      - "no_facial_recognition"
+      - "no_individual_targeting"
+    export_targets: ["verified_defense_only"]
+    additional_restrictions:
+      redact_facial_data: true
+      max_violence_fidelity: "abstracted"
+      require_ethics_board_approval: true
+      human_review_threshold: 10        # Human review every 10 records
+      audit_all_exports: true
+      buyer_vetting_required: true
+      no_authoritarian_buyers: true
+
+# =============================================================================
+# 4. NOVELTY SCORING CONFIGURATION
+# =============================================================================
+# Determines token rewards for player solutions
+
+novelty:
+  enabled: true
+
+  # Base reward
+  baseline_tokens: 10                   # Base tokens for any valid solution
+
+  # Multipliers (stack multiplicatively)
+  multipliers:
+    efficiency: 1.5                     # Solved faster than average
+    creativity: 3.0                     # Used tools in unexpected ways
+    collaboration: 1.2                  # Worked with other players
+    first_solution: 5.0                 # First player to solve a new problem type
+    edge_case: 2.0                      # Handled an unusual scenario
+
+  # Biome weights (applied on top of multipliers)
+  # Defined per-biome above, referenced here for clarity
+
+  # Anti-gaming measures
+  diminishing_returns:
+    enabled: true
+    threshold: 100                      # After 100 similar solutions
+    decay_rate: 0.95                    # Each subsequent solution worth 5% less
+    floor: 0.1                          # Never go below 10% of base value
+
+  # Quality thresholds
+  minimum_solution_time_seconds: 30     # Solutions under 30s = suspicious
+  require_physics_validation: true      # Solution must be physically plausible
+
+# =============================================================================
+# 5. DATA EXPORT CONTROLS
+# =============================================================================
+# Final checkpoint before data leaves the system
+
+exports:
+  enabled: true
+
+  # Batch controls
+  require_human_review_above: 1000      # Batches > 1000 records need human approval
+  max_batch_size: 10000                 # Hard limit on single export
+
+  # Buyer management
+  allowed_buyers:
+    - id: "energy_partners"
+      classification_level: "UNCLASSIFIED"
+      biomes: ["abyss"]
+      vetting_status: "approved"
+
+    - id: "fema"
+      classification_level: "UNCLASSIFIED"
+      biomes: ["ruins", "exodus"]
+      vetting_status: "approved"
+
+    - id: "dod_cleared"
+      classification_level: "SECRET"
+      biomes: ["theater", "brink"]
+      vetting_status: "approved"
+      clearance_required: true
+
+    - id: "cdc_cleared"
+      classification_level: "SECRET"
+      biomes: ["vector"]
+      vetting_status: "approved"
+      clearance_required: true
+
+    - id: "verified_defense_only"
+      classification_level: "RESTRICTED"
+      biomes: ["uprising"]
+      vetting_status: "pending_ethics_board"
+      clearance_required: true
+      ethics_board_approval: true
+
+  # Audit and compliance
+  audit_log: true
+  retention_days: 2555                  # 7 years for compliance
+  encryption_required: true
+  encryption_standard: "AES-256"
+
+# =============================================================================
+# 6. HISTORICAL ERAS CONFIGURATION
+# =============================================================================
+# Defines ethics and governance for historical gameplay (pre-AI Era)
+
+historical_eras:
+  enabled: true
+
+  # ---------------------------------------------------------------------------
+  # ANCIENT ERA (4000 BCE - 500 BCE)
+  # ---------------------------------------------------------------------------
+  ancient:
+    id: "ancient"
+    name: "The Cradle"
+    time_period: "4000 BCE - 500 BCE"
+    settings: ["Sumer", "Egypt", "Indus Valley"]
+
+    ethics_level: "historical"
+    special_rules:
+      - "present_slavery_historically_without_glorifying"
+      - "capture_player_moral_reasoning"
+      - "no_gratuitous_violence"
+
+    training_data_value:
+      primary: "Civilization building, basic survival"
+      buyers: ["city_planners", "development_orgs", "historians"]
+
+    challenges:
+      - "the_flood"
+      - "the_famine"
+      - "the_raiders"
+      - "the_plague"
+      - "the_succession"
+
+    novelty_weight: 1.0
+    technology_level: "stone_bronze"
+
+  # ---------------------------------------------------------------------------
+  # CLASSICAL ERA (500 BCE - 500 CE)
+  # ---------------------------------------------------------------------------
+  classical:
+    id: "classical"
+    name: "The Empires"
+    time_period: "500 BCE - 500 CE"
+    settings: ["Athens", "Rome", "Persia", "Han China"]
+
+    ethics_level: "historical"
+    special_rules:
+      - "present_slavery_historically_without_glorifying"
+      - "capture_player_moral_reasoning"
+      - "abstract_gladiatorial_violence"
+      - "no_real_faction_glorification"
+
+    training_data_value:
+      primary: "Governance, empire management, collapse patterns"
+      buyers: ["political_scientists", "governments", "historians"]
+
+    challenges:
+      - "the_forum"
+      - "the_legion"
+      - "the_slave_question"
+      - "the_fall"
+
+    novelty_weight: 1.1
+    technology_level: "iron_roads"
+
+  # ---------------------------------------------------------------------------
+  # MEDIEVAL ERA (500 CE - 1400 CE)
+  # ---------------------------------------------------------------------------
+  medieval:
+    id: "medieval"
+    name: "Survival & Faith"
+    time_period: "500 CE - 1400 CE"
+    settings: ["Feudal Manor", "Monastery", "Guild Town", "Silk Road"]
+
+    ethics_level: "historical"
+    special_rules:
+      - "present_religious_persecution_without_glorifying"
+      - "capture_pandemic_response_behavior"
+      - "abstract_torture_methods"
+      - "focus_on_survival_choices"
+
+    training_data_value:
+      primary: "Crisis survival, institutional collapse, pandemic response"
+      buyers: ["disaster_response", "ngos", "cdc", "who", "historians"]
+
+    challenges:
+      - "the_black_death"
+      - "the_feudal_system"
+      - "the_crusade"
+      - "the_inquisition"
+
+    novelty_weight: 1.5                        # Black Death data is valuable
+    technology_level: "castles_guilds"
+
+  # ---------------------------------------------------------------------------
+  # RENAISSANCE ERA (1400 CE - 1750 CE)
+  # ---------------------------------------------------------------------------
+  renaissance:
+    id: "renaissance"
+    name: "Discovery"
+    time_period: "1400 CE - 1750 CE"
+    settings: ["Florence", "Lisbon", "Amsterdam", "New World", "Ottoman"]
+
+    ethics_level: "historical"
+    special_rules:
+      - "present_colonization_critically"
+      - "capture_indigenous_perspective"
+      - "no_genocide_glorification"
+      - "focus_on_paradigm_shift_decisions"
+
+    training_data_value:
+      primary: "Innovation adoption, paradigm shifts, first contact"
+      buyers: ["rd_organizations", "anthropologists", "historians"]
+
+    challenges:
+      - "the_voyage"
+      - "the_reformation"
+      - "the_encounter"
+      - "the_inquisition_renewed"
+      - "the_tulip_bubble"
+
+    novelty_weight: 1.2
+    technology_level: "printing_sailing"
+
+  # ---------------------------------------------------------------------------
+  # INDUSTRIAL ERA (1750 CE - 1900 CE)
+  # ---------------------------------------------------------------------------
+  industrial:
+    id: "industrial"
+    name: "Revolution"
+    time_period: "1750 CE - 1900 CE"
+    settings: ["Manchester", "New York", "Paris", "Frontier", "Colony"]
+
+    ethics_level: "historical"
+    special_rules:
+      - "present_labor_exploitation_critically"
+      - "capture_worker_organizing"
+      - "focus_on_technological_displacement"
+      - "no_slavery_glorification"
+
+    training_data_value:
+      primary: "Labor dynamics, technological change, revolution triggers"
+      buyers: ["workforce_planning", "labor_economists", "historians"]
+
+    challenges:
+      - "the_factory"
+      - "the_tenement"
+      - "the_uprising_1848"
+      - "the_displacement"
+
+    novelty_weight: 1.3
+    technology_level: "steam_factories"
+
+  # ---------------------------------------------------------------------------
+  # MODERN ERA (1900 CE - 2020 CE)
+  # ---------------------------------------------------------------------------
+  modern:
+    id: "modern"
+    name: "Extremes"
+    time_period: "1900 CE - 2020 CE"
+    settings: ["World Wars", "Cold War", "Digital Revolution", "Climate Crisis"]
+
+    ethics_level: "elevated"
+    special_rules:
+      - "abstract_holocaust_genocide"          # Never simulate directly
+      - "no_nazi_glorification"
+      - "focus_on_civilian_survival"
+      - "capture_nuclear_fear_psychology"
+      - "present_climate_science_accurately"
+
+    training_data_value:
+      primary: "Existential risk, information abundance, global systems"
+      buyers: ["risk_analysts", "think_tanks", "climate_scientists"]
+
+    challenges:
+      - "the_trenches"
+      - "the_occupation"
+      - "the_shelter"
+      - "the_digital_divide"
+
+    novelty_weight: 1.4
+    technology_level: "electricity_computing"
+
+    additional_restrictions:
+      # WW2 specific
+      holocaust_content: "reference_only"      # Never playable scenario
+      atomic_bombing: "aftermath_only"         # Focus on survivors, not the event
+      # Cold War specific
+      nuclear_weapons: "abstract_threat"       # No operational details
+
+# ---------------------------------------------------------------------------
+# ERA PROGRESSION MECHANICS
+# ---------------------------------------------------------------------------
+era_progression:
+  modes:
+    chronological:
+      description: "Start in Sumer, progress through all eras"
+      starting_era: "ancient"
+      progression: "sequential"
+      unlocked_by_default: true
+
+    era_select:
+      description: "Choose starting era"
+      unlocked_by:
+        - "completed_previous_era"
+        - "premium_purchase"
+      benefit: "Jump to preferred period"
+
+    time_traveler:
+      description: "Random era placement"
+      unlocked_by: "achievement_historian"
+      challenge: "Adapt to any period"
+      reward_multiplier: 1.25
+
+    modern_start:
+      description: "Begin in AI Era directly"
+      starting_era: "ai_era"
+      default_for_new_players: true
+      can_unlock_history: true
+
+  transition_triggers:
+    # How players move between eras
+    method: "milestone_completion"
+    minimum_achievements_per_era: 5
+    era_finale_required: true
+
+  persistence_across_eras:
+    reputation: "modified_by_context"          # Reputation carries but adapts
+    timeless_items: ["gold", "gems", "jewelry"]
+    knowledge: "contextual"                    # Skills adapt to era tech
+    bloodline: "optional_mechanic"             # Family continuity
+
+# ---------------------------------------------------------------------------
+# REINCARNATION MECHANICS
+# ---------------------------------------------------------------------------
+reincarnation:
+  enabled: true
+
+  # Keystone challenges required to advance
+  keystone_challenges:
+    ancient:
+      challenges: ["the_great_flood", "the_first_laws", "the_bronze_secret"]
+      required_to_advance: 2
+
+    classical:
+      challenges: ["the_democratic_experiment", "the_road_network", "the_fall_prevention"]
+      required_to_advance: 2
+
+    medieval:
+      challenges: ["the_black_death", "the_knowledge_preservation", "the_guild_formation"]
+      required_to_advance: 2
+
+    renaissance:
+      challenges: ["the_printing_revolution", "the_new_world_ethics", "the_scientific_method"]
+      required_to_advance: 2
+
+    industrial:
+      challenges: ["the_labor_rights", "the_urban_health", "the_displacement"]
+      required_to_advance: 2
+
+    modern:
+      challenges: ["the_world_wars", "the_nuclear_dilemma", "the_digital_divide"]
+      required_to_advance: 2
+
+  # What carries forward on reincarnation
+  carry_forward:
+    always: ["gold", "gems", "jewelry", "reputation", "achievements"]
+    auction: ["assets", "inventory", "structures"]
+    lost: ["era_specific_items", "non_portable_goods"]
+
+  # Auction settings for era transitions
+  transition_auctions:
+    default_duration_hours: 48
+    platform_fee: 0.10                         # 10% to platform
+    seller_minimum_guarantee: 0.50             # At least 50% of estimated value
+    flash_auction_duration_hours: 4            # For catastrophe liquidations
+
+# ---------------------------------------------------------------------------
+# ERA SCARCITY CONSTRAINTS
+# ---------------------------------------------------------------------------
+era_scarcity:
+  enabled: true
+  per_server_players: 10000                    # Base calculation for limits
+
+  # Asset limits per era (per 10,000 active players)
+  asset_limits:
+    ancient:
+      communities: 20
+      farms: 100
+      shops: 50
+      workshops: 25
+      estates: 5
+
+    classical:
+      communities: 50
+      farms: 200
+      shops: 150
+      workshops: 75
+      estates: 15
+
+    medieval:
+      communities: 75
+      farms: 300
+      shops: 200
+      workshops: 150
+      estates: 25
+
+    renaissance:
+      communities: 100
+      farms: 400
+      shops: 400
+      workshops: 300
+      estates: 40
+
+    industrial:
+      communities: 150
+      farms: 200                               # Decreases (industrialized agriculture)
+      shops: 800
+      workshops: 600
+      estates: 75
+
+    modern:
+      communities: 200
+      farms: 100                               # Decreases further (agribusiness)
+      shops: 1000
+      workshops: 800
+      estates: 150
+
+    ai_era:
+      communities: 250
+      farms: 50                                # Minimal (automated)
+      shops: 1200
+      workshops: 1000
+      estates: 200
+
+  # Asset acquisition methods
+  acquisition_methods:
+    - "claim"                                  # Early eras, frontier areas
+    - "purchase"                               # From market or NPC
+    - "earn"                                   # Keystone challenge rewards
+    - "inherit"                                # Bloodline mechanic
+    - "conquer"                                # Era-appropriate warfare
+    - "auction"                                # Era transition events
+
+# ---------------------------------------------------------------------------
+# ERA TIMEOUT & CATASTROPHE MECHANICS
+# ---------------------------------------------------------------------------
+era_catastrophes:
+  enabled: true
+
+  # LOCALIZED MODEL: Catastrophes don't wipe everyone
+  localization:
+    model: "regional"                          # Not global wipes
+    impact_zones:
+      devastation:
+        map_percentage: 0.20                   # 20% of map
+        asset_loss: 0.80                       # 80-100% loss
+        effect: "forced_evacuation"
+
+      damage:
+        map_percentage: 0.30                   # 30% of map
+        asset_loss: 0.45                       # 30-60% damage
+        effect: "survivable_with_preparation"
+
+      disruption:
+        map_percentage: 0.30                   # 30% of map
+        asset_loss: 0.20                       # 10-30% economic impact
+        effect: "trade_disruption_refugees"
+
+      safe:
+        map_percentage: 0.20                   # 20% of map
+        asset_loss: 0.05                       # Minimal impact
+        effect: "opportunity_for_expansion"
+
+  # Post-catastrophe opportunities for survivors
+  survivor_opportunities:
+    land_claims:
+      enabled: true
+      window_days: 14                          # 7-14 days to claim abandoned assets
+      priority_order: ["adjacent_owners", "community_members", "open"]
+
+    labor_shortage:
+      wage_multiplier: 1.5                     # Post-catastrophe wage boost
+      skill_premium: 2.0                       # Skilled labor very valuable
+
+    rebuilding_bonuses:
+      builder_nvt_bonus: 0.25                  # 25% bonus for reconstruction
+      new_trade_routes: true
+
+  # Time limits per era (in real-world days)
+  time_limits:
+    ancient:
+      soft_limit_days: 60
+      hard_limit_days: 90
+      catastrophes: ["great_flood", "drought_famine", "sea_peoples"]
+
+    classical:
+      soft_limit_days: 75
+      hard_limit_days: 120
+      catastrophes: ["plague_justinian", "barbarian_invasion"]
+
+    medieval:
+      soft_limit_days: 90
+      hard_limit_days: 150
+      catastrophes: ["black_death", "crusade_warfare"]
+
+    renaissance:
+      soft_limit_days: 90
+      hard_limit_days: 150
+      catastrophes: ["smallpox_epidemic", "religious_wars"]
+
+    industrial:
+      soft_limit_days: 60
+      hard_limit_days: 100
+      catastrophes: ["cholera_outbreak", "world_war"]
+
+    modern:
+      soft_limit_days: 90
+      hard_limit_days: 180
+      catastrophes: ["climate_disaster", "nuclear_standoff"]
+
+  # Positioning strategies that improve survival
+  positioning_factors:
+    geographic:
+      highlands: 0.30                          # 30% safer from floods
+      isolation: 0.40                          # 40% safer from disease
+      fortifications: 0.25                     # 25% safer from conflict
+
+    economic:
+      diversified_assets: 0.20
+      liquid_wealth: 0.25
+      essential_goods: 0.15
+
+    social:
+      community_ties: 0.15
+      religious_standing: 0.10
+      guild_membership: 0.10
+
+# ---------------------------------------------------------------------------
+# WAR & CONFLICT SYSTEM
+# ---------------------------------------------------------------------------
+war_system:
+  enabled: true
+
+  # War types
+  types:
+    declared_war:
+      description: "Formal conflict between communities/factions"
+      requirements: ["leader_vote", "casus_belli", "resource_stockpile"]
+
+    raids:
+      description: "Quick strikes for resources"
+      requirements: ["raiding_party", "target_identified"]
+
+    sieges:
+      description: "Extended blockades of fortified positions"
+      requirements: ["siege_equipment", "supply_lines"]
+
+    civil_war:
+      description: "Internal faction conflicts"
+      requirements: ["faction_split", "grievance"]
+
+  # Participation roles
+  participation_roles:
+    combatant:
+      risk: "high"
+      reward: "high"
+      training_data: "conflict_decision_making"
+
+    supplier:
+      risk: "medium"
+      reward: "medium"
+      training_data: "logistics_ethics"
+
+    refugee:
+      risk: "low"
+      reward: "safety"
+      training_data: "displacement_behavior"
+
+    profiteer:
+      risk: "high_if_caught"
+      reward: "high"
+      training_data: "ethical_boundaries"
+
+    resister:
+      risk: "era_dependent"
+      reward: "reputation"
+      training_data: "resistance_organization"
+
+  # Combat abstraction (strategic, not violent)
+  combat:
+    system: "abstracted_tactical"
+    factors: ["numbers", "equipment", "leadership", "terrain", "supply", "morale"]
+    violence_display: "abstracted"             # Never graphic
+
+  # Ethics guardrails
+  ethics:
+    violence_glorification: false
+    civilian_harm_consequences: true
+    war_crimes_punished: true
+    focus: "strategic_decisions"
+
+# ---------------------------------------------------------------------------
+# RELIGION & RITUAL SYSTEM
+# ---------------------------------------------------------------------------
+religion_system:
+  enabled: true
+
+  # Functions of religion in gameplay
+  functions:
+    community_cohesion:
+      effect: "shared_rituals_bond_groups"
+      morale_bonus: 0.15
+
+    crisis_response:
+      types: ["prayer", "sacrifice", "scapegoating", "quarantine"]
+      training_data: "belief_behavior_under_stress"
+
+    social_hierarchy:
+      priest_power: true
+      influence_decisions: true
+
+    conflict_trigger:
+      religious_differences: "can_cause_wars"
+      training_data: "religious_conflict_dynamics"
+
+  # Ritual participation effects
+  ritual_effects:
+    active_participant:
+      morale: 0.15
+      community_standing: 0.10
+      suspicion: -0.20
+
+    occasional:
+      morale: 0.05
+      community_standing: 0.0
+      suspicion: 0.0
+
+    non_participant:
+      morale: 0.0
+      community_standing: -0.10
+      suspicion: 0.30                          # Era-dependent
+
+  # Era-specific systems
+  era_religions:
+    ancient: "polytheistic"
+    classical: "state_religion_philosophy"
+    medieval: "monotheistic_dominance"
+    renaissance: "reformation_counter_reformation"
+    industrial: "secularization_begins"
+    modern: "pluralism_fundamentalism"
+
+  # Training data capture
+  training_data_questions:
+    - "Do players follow rituals for benefit or belief?"
+    - "How does ritual participation change under stress?"
+    - "What triggers abandonment of traditional practices?"
+    - "How do communities enforce religious conformity?"
+
+  # Ethics guardrails
+  ethics:
+    no_real_religion_mockery: true
+    present_historically: true
+    capture_player_reasoning: true
+    no_forced_conversion_glorification: true
+
+# =============================================================================
+# 7. LIVING FUTURE CONFIGURATION
+# =============================================================================
+# Real-world events become game content
+
+living_future:
+  enabled: true
+
+  # Content integration
+  news_integration:
+    enabled: true
+    delay_period_days: 14                      # Minimum delay before event becomes content
+    sensitive_event_delay_days: 90             # Tragedies need longer delay
+
+    sources:
+      - type: "curated"
+        provider: "editorial_team"
+        priority: "high"
+
+      - type: "partner"
+        providers: ["reuters", "ap", "bbc"]
+        filter: "non_graphic"
+
+    auto_categorization:
+      natural_disaster: "ruins"
+      water_crisis: "aqua"
+      food_insecurity: "botany"
+      migration: "exodus"
+      conflict: "theater"
+      pandemic: "vector"
+      tech_breakthrough: "all_biomes"
+      space_exploration: "scorch"
+      ai_development: "uprising"
+
+  # Community contributions
+  community_proposals:
+    enabled: true
+    voting_threshold: 1000                     # Votes needed for consideration
+    editorial_review: true
+    proposer_reward: 500                       # Novelty tokens if approved
+
+  # Ethical guardrails
+  guardrails:
+    no_exploitation_of_tragedy: true
+    educational_framing_required: true
+    victim_dignity_protected: true
+    gaian_ethics_review: true
+
+    blocked_event_types:
+      - "mass_shootings"
+      - "terrorist_attacks_recent"
+      - "child_harm_events"
+      - "ongoing_active_conflicts"
+
+  # Seasonal updates
+  seasonal:
+    quarterly_content_drops: true
+    annual_theme: true
+    historical_anniversaries: true
+
+# =============================================================================
+# 8. INSTANCE SCALING CONFIGURATION
+# =============================================================================
+# Horizontal scaling through parallel era instances
+
+instance_scaling:
+  enabled: true
+
+  # Population composition
+  population_model:
+    player_npc_ratio:
+      minimum_players: 0.30           # At least 30% real players
+      target_players: 0.50            # Ideal: 50% real, 50% NPC
+      maximum_players: 0.80           # Cap at 80% to maintain NPC economy
+
+    minimum_player_threshold: 0.20    # Below this, instance may be merged
+
+  # NPC roles and functions
+  npc_functions:
+    population_filler: true           # Maintain realistic density
+    interaction_partners: true        # Trade, quest, social
+    economy_stabilizers: true         # Prevent market crashes
+    training_data_baseline: true      # Comparison data for player behavior
+
+  # Era-specific instance parameters
+  era_instances:
+    ancient:
+      target_population: 10000
+      max_players: 5000
+      min_players_viable: 2000
+      spawn_threshold: 4500
+      max_instances: 500
+      procedural_variants: ["river_delta", "highland", "coastal"]
+
+    classical:
+      target_population: 25000
+      max_players: 12500
+      min_players_viable: 5000
+      spawn_threshold: 11000
+      max_instances: 300
+      procedural_variants: ["greek_polis", "roman_city", "persian_province", "han_district"]
+
+    medieval:
+      target_population: 15000
+      max_players: 7500
+      min_players_viable: 3000
+      spawn_threshold: 6500
+      max_instances: 400
+      procedural_variants: ["western_europe", "eastern_europe", "middle_east", "silk_road"]
+
+    renaissance:
+      target_population: 30000
+      max_players: 15000
+      min_players_viable: 6000
+      spawn_threshold: 13000
+      max_instances: 250
+      procedural_variants: ["italian_city_state", "northern_port", "new_world_colony", "ottoman_city"]
+
+    industrial:
+      target_population: 50000
+      max_players: 25000
+      min_players_viable: 10000
+      spawn_threshold: 22000
+      max_instances: 200
+      procedural_variants: ["factory_town", "port_city", "mining_region", "frontier"]
+
+    modern:
+      target_population: 100000
+      max_players: 50000
+      min_players_viable: 20000
+      spawn_threshold: 45000
+      max_instances: 150
+      procedural_variants: ["pre_war", "interwar", "cold_war", "digital_age"]
+
+    ai_era:
+      target_population: 50000
+      max_players: 25000
+      min_players_viable: 10000
+      spawn_threshold: 22000
+      max_instances_per_biome: 200
+      procedural_variants: ["biome_specific"]
+
+  # Training data requirements
+  training_data_thresholds:
+    interaction_rate_warning: 0.5     # 50% of target
+    interaction_rate_critical: 0.3    # 30% = trigger merge
+    novelty_score_warning: 0.4        # Data becoming repetitive
+    novelty_score_critical: 0.2       # Urgent: not enough novel behavior
+
+  # Cross-instance systems
+  cross_instance:
+    reputation_scope: "era_wide"      # Carries across instances within era
+    currency_nvt: "global"            # Novelty tokens work everywhere
+    currency_local: "instance_specific"
+    markets_scope: "instance_local"   # Can't trade across instances
+    instance_transfer_cost: 50        # NVT cost to move
+    instance_transfer_cooldown_days: 7
+
+  # Instance lifecycle
+  lifecycle:
+    auto_spawn: true                  # Automatically create new instances
+    auto_merge: true                  # Merge underpopulated instances
+    merge_migration_period_days: 7    # Time for players to relocate
+    asset_handling: "auction_or_transfer"
+
+# =============================================================================
+# 9. CIRCUIT BREAKERS
+# =============================================================================
+# Safety valves for anomalous situations
+
+circuit_breakers:
+  enabled: true
+
+  # Automatic pause triggers
+  ethics_violation_threshold: 50        # 50 violations in 1 hour = pause biome
+  anomaly_rate_threshold: 0.15          # 15% anomalous data = alert
+  export_failure_threshold: 5           # 5 failed exports = pause exports
+
+  # Escalation
+  emergency_contacts:
+    - "founder@analogeconomy.com"
+    - "ethics-board@analogeconomy.com"
+
+  # Recovery
+  auto_recovery_enabled: false          # Require manual intervention
+  require_postmortem: true              # Document all circuit breaker events
+
+# =============================================================================
+# 10. KARMA SYSTEM
+# =============================================================================
+# Tracks moral choices and affects reincarnation
+
+karma_system:
+  enabled: true
+
+  # Karma scale
+  scale:
+    minimum: -1000
+    maximum: 1000
+    starting_value: 0
+
+  # Karma brackets and reincarnation effects
+  brackets:
+    enlightened:
+      range: [800, 1000]
+      human_reincarnation: true
+      choice_level: "full"              # Choose any next life
+      description: "Exceptionally virtuous"
+
+    virtuous:
+      range: [400, 800]
+      human_reincarnation: true
+      choice_level: "favorable"         # Human, good circumstances
+      description: "Good standing"
+
+    balanced:
+      range: [-200, 400]
+      human_reincarnation: true
+      choice_level: "normal"            # Human, standard
+      description: "Normal range"
+
+    troubled:
+      range: [-500, -200]
+      human_reincarnation: true
+      choice_level: "difficult"         # Human, hard start
+      description: "Significant negative karma"
+
+    corrupted:
+      range: [-800, -500]
+      human_reincarnation: false
+      animal_chance: 0.50               # 50% chance animal
+      description: "Heavily negative karma"
+
+    damned:
+      range: [-1000, -800]
+      human_reincarnation: false
+      animal_chance: 1.00               # Guaranteed animal
+      description: "Extreme negative karma"
+
+  # Karma changes for actions
+  actions:
+    positive:
+      save_life: 25
+      help_stranger: 5
+      peaceful_resolution: 20
+      sacrifice_for_others: 30
+      codex_contribution: 5
+      mentor_new_player: 10
+      protect_innocent: 15
+      forgive_enemy: 25
+
+    negative:
+      murder: -50
+      murder_innocent: -100
+      theft: -15
+      betrayal: -40
+      torture: -100
+      exploitation: -25
+      abandon_dependents: -35
+
+    neutral:
+      self_defense: 0
+      declared_war_combat: -5
+      executing_criminal: -10
+
+  # Karma decay
+  decay:
+    positive_decay_per_week: -1         # Slow decay of good karma
+    negative_recovery_per_week: 2       # Faster recovery from bad karma
+
+  # Visibility
+  visibility:
+    self_visible: true
+    others_see_bracket_only: true       # Can't see exact number
+    visual_indicators: true             # Aura/appearance changes
+
+# =============================================================================
+# 11. ANIMAL REINCARNATION
+# =============================================================================
+# Mechanics for karma-based animal rebirth
+
+animal_reincarnation:
+  enabled: true
+
+  # Animal tiers by karma
+  tiers:
+    corrupted:
+      karma_range: [-800, -500]
+      animals: ["dog", "horse", "cat"]
+      duration_days:
+        minimum: 7
+        maximum: 14
+
+    damned:
+      karma_range: [-1000, -800]
+      animals: ["mule", "pig", "rat"]
+      duration_days:
+        minimum: 14
+        maximum: 30
+
+  # Animal life mechanics
+  mechanics:
+    communication: "emotes_only"        # Cannot speak
+    autonomy: "follow_commands"         # Must obey owner
+    owner_visibility: false             # Owner doesn't know it's a player
+
+  # Ending animal life
+  endings:
+    duration_expires:
+      result: "human_troubled"
+      karma_reset_to: -200
+
+    owner_frees:
+      result: "human_balanced"
+      karma_bonus: 50
+      owner_karma_bonus: 25
+
+    heroic_act:
+      result: "human_virtuous"
+      karma_bonus: 100
+
+    death_as_animal:
+      result: "different_animal"
+      duration: "reset"
+
+  # Owner treatment effects
+  owner_treatment:
+    good:
+      karma_recovery_per_day: 5
+      duration_reduction: 0.10
+
+    average:
+      karma_recovery_per_day: 3
+      duration_reduction: 0.0
+
+    bad:
+      karma_recovery_per_day: 1
+      duration_reduction: 0.0
+      escape_option: true
+
+# =============================================================================
+# 12. THEFT & CONQUEST SYSTEM
+# =============================================================================
+# Asset protection, checkpoint theft, control vs ownership
+
+theft_conquest:
+  enabled: true
+
+  # Checkpoint system
+  checkpoints:
+    auto_save_hours: 4
+    manual_save_locations: ["settlement", "shrine", "bank", "owned_property"]
+    manual_save_cost: 0                 # Free at locations
+
+  # Theft mechanics
+  theft:
+    victim_loses: "time_only"           # Reset to checkpoint
+    victim_keeps: "all_items"           # Everything preserved
+    detection_base_chance: 0.40         # 40% base detection
+
+    # Thief rewards (Shadow Marks)
+    rewards:
+      pickpocket: [5, 15]
+      burglary: [20, 40]
+      heist: [50, 100]
+
+    # Shadow Marks spending
+    shadow_marks:
+      can_buy: ["thief_guild_items", "stealth_cosmetics"]
+      cannot_buy: ["nfts", "tradeable_items", "regular_currency"]
+
+  # Conquest mechanics
+  conquest:
+    ownership_transfer: false           # Owner keeps NFT/deed
+    control_transfer: true              # Controller gets operational control
+
+    income_split:
+      owner_royalty: 0.20               # 20% passive to owner
+      controller_income: 0.80           # 80% to controller
+
+    # Dominion Marks
+    dominion_marks:
+      can_buy: ["military_equipment", "governance_tools", "conquest_cosmetics"]
+      cannot_buy: ["nfts", "deeds", "tradeable_items"]
+
+  # Victim protections
+  protections:
+    theft_cooldown_same_thief_hours: 24
+    theft_cooldown_general_after_3: 48
+    new_player_immunity_days: 7
+    checkpoint_insurance_available: true
