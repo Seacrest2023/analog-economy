@@ -29,46 +29,10 @@ classifiers = [
 # =============================================================================
 
 # -----------------------------------------------------------------------------
-# Black - Code Formatter
+# Ruff - Fast Python Linter & Formatter
 # -----------------------------------------------------------------------------
-[tool.black]
-line-length = 100
-target-version = ['py311', 'py312']
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-  | __pycache__
-)/
-'''
-
-# -----------------------------------------------------------------------------
-# isort - Import Sorter
-# -----------------------------------------------------------------------------
-[tool.isort]
-profile = "black"
-line_length = 100
-multi_line_output = 3
-include_trailing_comma = true
-force_grid_wrap = 0
-use_parentheses = true
-ensure_newline_before_comments = true
-skip_gitignore = true
-known_first_party = ["gaian"]
-sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
-
-# -----------------------------------------------------------------------------
-# Ruff - Fast Python Linter
-# -----------------------------------------------------------------------------
+# Ruff replaces: black, isort, flake8, and parts of pylint
+# See: https://docs.astral.sh/ruff/
 [tool.ruff]
 line-length = 100
 target-version = "py311"
@@ -78,7 +42,7 @@ select = [
     "E",      # pycodestyle errors
     "W",      # pycodestyle warnings
     "F",      # Pyflakes
-    "I",      # isort
+    # "I",    # isort - DISABLED: standalone isort hook handles this to avoid conflicts
     "B",      # flake8-bugbear
     "C4",     # flake8-comprehensions
     "UP",     # pyupgrade
@@ -86,7 +50,7 @@ select = [
     "SIM",    # flake8-simplify
 ]
 ignore = [
-    "E501",   # line too long (handled by black)
+    "E501",   # line too long (handled by ruff-format)
     "B008",   # do not perform function calls in argument defaults
     "B904",   # raise without from inside except
     "ARG001", # unused function argument (common in FastAPI)
@@ -182,3 +146,22 @@ show_missing = true
 init_forbid_extra = true
 init_typed = true
 warn_required_dynamic_aliases = true
+
+# -----------------------------------------------------------------------------
+# mutmut - Mutation Testing
+# -----------------------------------------------------------------------------
+# Verifies test quality, not just coverage. If a mutation survives,
+# the tests are not catching bugs that could be introduced.
+[tool.mutmut]
+paths_to_mutate = "core-governance/gaian/core/"  # Only mutate the Hexagon (Pure Core)
+runner = "pytest"
+tests_dir = "core-governance/tests/"
+dict_synonyms = ["Enum", "NamedTuple"]
+
+# -----------------------------------------------------------------------------
+# pytest-split - CI Sharding for Parallel Testing
+# -----------------------------------------------------------------------------
+# Enables splitting tests across multiple CI runners for faster feedback.
+# Usage in CI: pytest --splits 4 --group ${{ matrix.group }}
+[tool.pytest-split]
+# Automatically calculated based on test duration

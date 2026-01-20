@@ -17,27 +17,28 @@ httpx>=0.26.0
 # JSON (fast)
 orjson>=3.9.0
 
-# Logging
-loguru>=0.7.2
+# Observability (JSON Structured Logging)
+structlog>=24.1.0  # ALIGNED: Matches OBSERVABILITY.md standards
 
 # DateTime
 pendulum>=3.0.0
 
-# Database (when needed)
+# Database (Phase 2 placeholder)
 # sqlalchemy>=2.0.0
 # asyncpg>=0.29.0
 
-# ML/Data Processing (when needed)
-# numpy>=1.26.0
-# pandas>=2.1.0
-# pyarrow>=14.0.0
-
-# Testing
+# Testing (The Defense Grid)
 pytest>=7.4.0
 pytest-asyncio>=0.23.0
 pytest-cov>=4.1.0
+pytest-split>=0.8.0   # CI sharding for parallel testing
+mutmut>=2.4.0         # Mutation testing
 
-# Development
-black>=23.12.0
-ruff>=0.1.0
-mypy>=1.8.0
+# Architecture Governance
+import-linter>=2.0.0  # ALIGNED: Enforces "Core cannot import API" rules
+
+# Development & Governance
+ruff>=0.4.0           # Fast linter + formatter
+mypy>=1.8.0           # Static Type Checking
+pylint>=3.0.0         # Sniper Mode (Duplicate Code)
+types-pyyaml>=6.0.0   # Mypy stubs

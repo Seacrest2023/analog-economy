@@ -3,14 +3,18 @@ Action Models
 
 Request and response models for the /api/v1/action endpoint.
 Designed to capture training data in SFT-compatible format.
+
+Architecture Rules:
+- NEVER use datetime. ALWAYS use pendulum.
+- NEVER use json. ALWAYS use orjson.
 """
 
-from datetime import datetime
 from enum import Enum
 from typing import Any
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, Field
+import pendulum
+from pydantic import AwareDatetime, BaseModel, Field
 
 
 class ActionType(str, Enum):
@@ -83,9 +87,10 @@ class ActionRequest(BaseModel):
     session_id: UUID = Field(..., description="Game session identifier")
     player_id: str = Field(..., min_length=1, description="Player identifier")
 
-    # Timing
-    timestamp: datetime = Field(
-        default_factory=datetime.utcnow, description="When action occurred (UTC)"
+    # Timing (AwareDatetime for Pydantic, pendulum.now for UTC timestamp)
+    timestamp: AwareDatetime = Field(
+        default_factory=lambda: pendulum.now("UTC"),
+        description="When action occurred (UTC)",
     )
     game_time: float | None = Field(default=None, description="In-game time (days since start)")
 
