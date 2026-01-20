@@ -27,12 +27,9 @@ on:
       - '.pre-commit-config.yaml'
       - '.governance/**'
       - 'pyproject.toml'
-  push:
-    branches: [master]
-    paths:
-      - 'core-governance/**'
-      - 'scripts/governance/**'
-      - '.governance/**'
+      - 'CLAUDE.md'
+  # NOTE: No push trigger - all changes go through PRs
+  # See CLAUDE.md "Git Workflow" section for the required process
 
 concurrency:
   group: governance-${{ github.workflow }}-${{ github.head_ref || github.ref }}
