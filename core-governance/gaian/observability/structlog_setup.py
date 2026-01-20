@@ -86,7 +86,7 @@ def configure_structlog(
     logging.getLogger("httpx").setLevel(logging.WARNING)
 
 
-def get_logger(name: str | None = None) -> structlog.stdlib.BoundLogger:
+def get_logger(name: str | None = None) -> structlog.BoundLogger:
     """
     Get a structlog logger instance.
 
@@ -96,5 +96,5 @@ def get_logger(name: str | None = None) -> structlog.stdlib.BoundLogger:
     Returns:
         A bound structlog logger.
     """
-    # structlog.get_logger() returns Any due to missing type stubs
-    return structlog.get_logger(name)  # type: ignore[no-any-return]  # IRON_DOME_EXEMPT: structlog lacks type stubs
+    # Ignore both: local mypy sees Any return, CI mypy has stubs and flags unused-ignore
+    return structlog.get_logger(name)  # type: ignore[no-any-return,unused-ignore]  # IRON_DOME_EXEMPT: env-dependent stubs
