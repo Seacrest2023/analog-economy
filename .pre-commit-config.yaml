@@ -1,0 +1,249 @@
+# =============================================================================
+# The Analog Economy: Unified Governance Router
+# =============================================================================
+# Routes Python, TypeScript, and C++ to their respective defense layers.
+#
+# Installation:
+#   pip install pre-commit
+#   pre-commit install
+#   pre-commit run --all-files
+#
+# Philosophy:
+#   - Iron Dome: Type safety ratchet (count can only go DOWN)
+#   - Rising Tide: Mock tax enforcement (tests cannot be >2x source)
+#   - Supply Chain: Hallucination detection (before npm install)
+#
+# Native Governance Strategy:
+#   Scripts are written in the language best suited to analyze the target code.
+#   - Python governance scripts: scripts/governance/python/
+#   - Node.js governance scripts: scripts/governance/node/
+# =============================================================================
+
+default_stages: [pre-commit]
+fail_fast: true
+
+repos:
+  # ===========================================================================
+  # LAYER 0: CONFIG FILE VALIDATION (All Languages)
+  # ===========================================================================
+  # Validates config files parse correctly BEFORE running heavy tools.
+  # If pyproject.toml or tsconfig.json is corrupted, all downstream
+  # governance layers fail-open. Catch this first.
+  - repo: local
+    hooks:
+      - id: config-validation
+        name: "Layer 0: Config File Validation"
+        entry: python scripts/governance/python/validate_config.py
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-commit]
+
+  # ===========================================================================
+  # LAYER 1: STANDARD JANITOR (All Languages)
+  # ===========================================================================
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: [--unsafe]  # Allow custom tags
+      - id: check-json
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-merge-conflict
+      - id: detect-private-key
+
+  # ===========================================================================
+  # PYTHON GOVERNANCE (core-governance/)
+  # ===========================================================================
+  # Path: core-governance/gaian/
+
+  # ---------------------------------------------------------------------------
+  # LAYER 2: IRON DOME (Type Safety Ratchet)
+  # ---------------------------------------------------------------------------
+  # Counts type-safety holes (Any, type: ignore, cast) and blocks commits
+  # that increase the count. Baseline only goes DOWN.
+  - repo: local
+    hooks:
+      - id: iron-dome-py
+        name: "Iron Dome (Python Type Safety)"
+        entry: python scripts/governance/python/check_iron_dome.py
+        language: system
+        files: ^core-governance/.*\.py$
+        pass_filenames: false
+        stages: [pre-commit]
+
+  # ---------------------------------------------------------------------------
+  # LAYER 3: RISING TIDE (Mock Tax)
+  # ---------------------------------------------------------------------------
+  # Enforces the "2x Rule": If a unit test is >2x larger than the source
+  # due to heavy mocking, it is rejected.
+  # Solution: Delete unit test, write integration test instead.
+  - repo: local
+    hooks:
+      - id: mock-tax-py
+        name: "Rising Tide (Mock Tax)"
+        entry: python scripts/governance/python/check_mock_tax.py
+        language: system
+        files: ^core-governance/tests/.*\.py$
+        pass_filenames: true
+        stages: [pre-commit]
+
+  # ---------------------------------------------------------------------------
+  # LAYER 4: IMPORT SORTER
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: ["--profile", "black", "--line-length=100"]
+        files: ^core-governance/
+
+  # ---------------------------------------------------------------------------
+  # LAYER 5: PYTHON FORMATTER (Black)
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/psf/black
+    rev: 24.4.2
+    hooks:
+      - id: black
+        files: ^core-governance/
+        args: [--line-length=100]
+
+  # ---------------------------------------------------------------------------
+  # LAYER 6: PYTHON LINTER (Ruff - faster than flake8)
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.4
+    hooks:
+      - id: ruff
+        files: ^core-governance/
+        args: [--fix, --exit-non-zero-on-fix]
+
+  # ---------------------------------------------------------------------------
+  # LAYER 7: STATIC TYPE CHECKER (mypy)
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.10.0
+    hooks:
+      - id: mypy
+        files: ^core-governance/gaian/
+        args: [--ignore-missing-imports, --no-strict-optional]
+        additional_dependencies:
+          - types-requests
+          - types-PyYAML
+          - pydantic
+
+  # ---------------------------------------------------------------------------
+  # LAYER 8: SECRET DETECTION
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: |
+          (?x)^(
+            .*\.lock$|
+            .*-lock\.json$|
+            \.env\.example$
+          )$
+
+  # ---------------------------------------------------------------------------
+  # LAYER 9: SRP SIZE GUARDRAILS
+  # ---------------------------------------------------------------------------
+  # Enforces Single Responsibility Principle via file/function size limits.
+  # Files >300 LOC warn, >600 LOC fail. Functions >75 LOC fail.
+  - repo: local
+    hooks:
+      - id: srp-check-py
+        name: "SRP Size Guardrails (Python)"
+        entry: python scripts/governance/python/check_srp_size.py
+        language: system
+        files: ^core-governance/gaian/.*\.py$
+        pass_filenames: false
+        stages: [pre-commit]
+
+  # ---------------------------------------------------------------------------
+  # LAYER 10: MOCK CONFORMANCE (create_autospec enforcement)
+  # ---------------------------------------------------------------------------
+  # Ensures test fixtures use create_autospec() instead of bare Mock().
+  # Bare mocks accept any method call, masking interface drift.
+  - repo: local
+    hooks:
+      - id: mock-conformance-py
+        name: "Mock Conformance (Python)"
+        entry: python scripts/governance/python/check_mock_conformance.py
+        language: system
+        files: ^core-governance/tests/conftest\.py$
+        pass_filenames: false
+        stages: [pre-commit]
+
+  # ===========================================================================
+  # TYPESCRIPT GOVERNANCE (web-portal/) - Future
+  # ===========================================================================
+  # Uncomment when web-portal is created
+
+  # ---------------------------------------------------------------------------
+  # SUPPLY CHAIN SECURITY (Hallucination Detector)
+  # ---------------------------------------------------------------------------
+  # Detects AI-hallucinated or typosquatted packages BEFORE npm ci.
+  # Runs when package.json changes.
+  # - repo: local
+  #   hooks:
+  #     - id: supply-chain-ts
+  #       name: "Supply Chain Security (TS)"
+  #       entry: node scripts/governance/node/check_supply_chain.js
+  #       language: system
+  #       files: ^web-portal/package\.json$
+  #       pass_filenames: false
+  #       stages: [pre-commit]
+
+  # ---------------------------------------------------------------------------
+  # TYPESCRIPT COMPILATION
+  # ---------------------------------------------------------------------------
+  # - repo: local
+  #   hooks:
+  #     - id: ts-compile
+  #       name: "TypeScript Compile"
+  #       entry: bash -c 'cd web-portal && npm run type-check'
+  #       language: system
+  #       files: ^web-portal/.*\.(ts|tsx)$
+  #       pass_filenames: false
+  #       stages: [pre-commit]
+
+  # ===========================================================================
+  # C++ GOVERNANCE (client-simulation/) - Future
+  # ===========================================================================
+  # Uncomment when client-simulation has C++ code outside UE5
+
+  # ---------------------------------------------------------------------------
+  # CLANG-FORMAT (C++ Formatting)
+  # ---------------------------------------------------------------------------
+  # - repo: https://github.com/pre-commit/mirrors-clang-format
+  #   rev: v18.1.4
+  #   hooks:
+  #     - id: clang-format
+  #       files: ^client-simulation/Source/.*\.(cpp|h)$
+  #       types_or: [c++, c]
+
+# =============================================================================
+# Configuration Notes
+# =============================================================================
+# Order matters: Config → Janitor → Iron Dome → Mock Tax → Formatter → Linter → Types → Secrets
+#
+# Python Path Routing:
+#   files: ^core-governance/.*\.py$ → Goes to Python governance
+#
+# TypeScript Path Routing (future):
+#   files: ^web-portal/.*\.(ts|tsx)$ → Goes to TypeScript governance
+#
+# C++ Path Routing (future):
+#   files: ^client-simulation/Source/.*\.(cpp|h)$ → Goes to C++ governance
+#
+# The "Rising Tide" philosophy:
+#   - Baseline: Existing issues are grandfathered
+#   - Ratchet: New issues are blocked
+#   - Over time, quality can only IMPROVE
+# =============================================================================

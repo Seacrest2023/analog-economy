@@ -31,7 +31,11 @@ analog-economy/
 ├── ops-infra/                    # THE WORLD (DevOps)
 ├── data/                         # Datasets & training outputs
 ├── tests/                        # E2E & integration tests
+├── scripts/                      # Automation & governance scripts
 ├── .github/                      # CI/CD workflows
+├── .governance/                  # Governance baselines (type-safety, mock-tax)
+├── .pre-commit-config.yaml       # Pre-commit hook configuration
+├── pyproject.toml                # Python tool configurations
 ├── .memory-layer/                # Mault local knowledge base (gitignored)
 ├── .gitignore
 └── README.md
@@ -332,19 +336,56 @@ tests/
     └── deploy.yml
 ```
 
+### `/scripts/governance` - Pre-commit Governance Scripts
+
+**Purpose:** Custom pre-commit hooks implementing Iron Dome, Rising Tide, and other governance policies.
+
+**Strategy:** Native Governance - scripts are written in the language best suited to analyze the target code.
+
+```
+scripts/
+└── governance/
+    ├── python/                       # Python governance scripts
+    │   ├── __init__.py
+    │   ├── validate_config.py        # Layer 0: Config file validation
+    │   ├── check_iron_dome.py        # Layer 2: Type safety ratchet
+    │   ├── check_mock_tax.py         # Layer 3: Rising Tide (2x rule)
+    │   ├── check_srp_size.py         # Layer 9: SRP size guardrails
+    │   └── check_mock_conformance.py # Layer 10: create_autospec enforcement
+    └── node/                         # Node.js governance scripts
+        └── check_supply_chain.js     # Supply chain hallucination detector
+```
+
+| Script | Layer | Target | Purpose |
+|--------|-------|--------|---------|
+| `validate_config.py` | 0 | All | Prevent governance fail-open |
+| `check_iron_dome.py` | 2 | Python | Type safety ratchet (only goes down) |
+| `check_mock_tax.py` | 3 | Python | Tests cannot be >2x source |
+| `check_srp_size.py` | 9 | Python | File/function size limits |
+| `check_mock_conformance.py` | 10 | Python | Enforce create_autospec() |
+| `check_supply_chain.js` | - | TypeScript | Detect hallucinated npm packages |
+
+**Why Native Languages?**
+- Python's `ast` module accurately counts type holes
+- Node.js natively parses `package.json` and TypeScript configs
+- Regex-based solutions are fragile and error-prone
+
+See: [PRECOMMIT-SETUP.md](../project%20setup/PRECOMMIT-SETUP.md)
+
 ---
 
 ## Governance Coverage
 
-| Directory | Language | Mault Governed | Alternative Tooling |
-|-----------|----------|----------------|---------------------|
-| `core-governance/` | Python | Yes | - |
+| Directory | Language | Pre-commit Governed | Alternative Tooling |
+|-----------|----------|---------------------|---------------------|
+| `core-governance/` | Python | Yes (Layers 0-10) | - |
 | `gaian/` | Python | Yes (structure only) | IP protection policies |
-| `web-portal/` | TypeScript | Yes | - |
-| `admin-tools/` | TypeScript | Yes | - |
-| `client-simulation/` | C++ | No | clang-tidy, UE standards |
+| `web-portal/` | TypeScript | Yes (Supply chain) | ESLint, tsc |
+| `admin-tools/` | TypeScript | Yes (Supply chain) | ESLint, tsc |
+| `client-simulation/` | C++ | Partial | clang-format, UE standards |
 | `economy-contracts/` | Solidity | No | Solhint, Slither |
 | `ops-infra/` | YAML/HCL | No | yamllint, tflint |
+| `scripts/governance/` | Python/Node.js | N/A (is the governance) | - |
 
 ---
 

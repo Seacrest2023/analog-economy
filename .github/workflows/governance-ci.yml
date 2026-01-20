@@ -1,0 +1,249 @@
+# =============================================================================
+# The Analog Economy: Governance CI
+# =============================================================================
+# This workflow enforces the Defense Grid on every Pull Request.
+# It runs the same governance scripts that pre-commit runs locally,
+# ensuring no one can bypass the rules by skipping pre-commit.
+#
+# Layers Enforced:
+#   - Layer 0: Config Validation
+#   - Layer 2: Iron Dome (Type Safety Ratchet)
+#   - Layer 3: Rising Tide (Mock Tax)
+#   - Layer 9: SRP Size Guardrails
+#   - Layer 10: Mock Conformance
+#   - Supply Chain Security (TypeScript - when enabled)
+# =============================================================================
+
+name: Governance CI
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'core-governance/**'
+      - 'web-portal/**'
+      - 'shared/**'
+      - 'scripts/governance/**'
+      - '.pre-commit-config.yaml'
+      - '.governance/**'
+      - 'pyproject.toml'
+  push:
+    branches: [master]
+    paths:
+      - 'core-governance/**'
+      - 'scripts/governance/**'
+      - '.governance/**'
+
+concurrency:
+  group: governance-${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ===========================================================================
+  # PRE-COMMIT: Run all hooks (mirrors local development)
+  # ===========================================================================
+  pre-commit:
+    name: Pre-commit Hooks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for baseline comparisons
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install pre-commit
+        run: pip install pre-commit
+
+      - name: Run pre-commit on all files
+        run: pre-commit run --all-files --show-diff-on-failure
+
+  # ===========================================================================
+  # LAYER 0: CONFIG VALIDATION
+  # ===========================================================================
+  config-validation:
+    name: "Layer 0: Config Validation"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate config files
+        run: python scripts/governance/python/validate_config.py
+
+  # ===========================================================================
+  # LAYER 2: IRON DOME (Type Safety Ratchet)
+  # ===========================================================================
+  iron-dome:
+    name: "Layer 2: Iron Dome"
+    runs-on: ubuntu-latest
+    needs: [config-validation]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run Iron Dome check
+        run: python scripts/governance/python/check_iron_dome.py
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+
+  # ===========================================================================
+  # LAYER 3: RISING TIDE (Mock Tax)
+  # ===========================================================================
+  mock-tax:
+    name: "Layer 3: Mock Tax"
+    runs-on: ubuntu-latest
+    needs: [config-validation]
+    if: hashFiles('core-governance/tests/**/*.py') != ''
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run Mock Tax check
+        run: |
+          # Find all test files and run mock tax
+          TEST_FILES=$(find core-governance/tests -name "*.py" -type f 2>/dev/null || echo "")
+          if [ -n "$TEST_FILES" ]; then
+            python scripts/governance/python/check_mock_tax.py $TEST_FILES
+          else
+            echo "No test files found, skipping mock tax check"
+          fi
+
+  # ===========================================================================
+  # LAYER 9: SRP SIZE GUARDRAILS
+  # ===========================================================================
+  srp-guardrails:
+    name: "Layer 9: SRP Guardrails"
+    runs-on: ubuntu-latest
+    needs: [config-validation]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run SRP size check
+        run: python scripts/governance/python/check_srp_size.py core-governance/
+
+  # ===========================================================================
+  # LAYER 10: MOCK CONFORMANCE
+  # ===========================================================================
+  mock-conformance:
+    name: "Layer 10: Mock Conformance"
+    runs-on: ubuntu-latest
+    needs: [config-validation]
+    if: hashFiles('core-governance/tests/conftest.py') != ''
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run Mock Conformance check
+        run: python scripts/governance/python/check_mock_conformance.py
+
+  # ===========================================================================
+  # SUPPLY CHAIN SECURITY (TypeScript)
+  # ===========================================================================
+  supply-chain:
+    name: "Supply Chain Security"
+    runs-on: ubuntu-latest
+    if: hashFiles('web-portal/package.json') != ''
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run supply chain check
+        run: |
+          if [ -f "scripts/governance/node/check_supply_chain.js" ]; then
+            node scripts/governance/node/check_supply_chain.js
+          else
+            echo "Supply chain script not found, skipping"
+          fi
+
+  # ===========================================================================
+  # AGGREGATOR: Single Status Check
+  # ===========================================================================
+  governance-status:
+    name: "Governance Status"
+    needs: [pre-commit, config-validation, iron-dome, mock-tax, srp-guardrails, mock-conformance]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check governance results
+        run: |
+          echo "Checking governance results..."
+
+          # Check each job result
+          if [ "${{ needs.pre-commit.result }}" == "failure" ]; then
+            echo "Pre-commit hooks failed"
+            exit 1
+          fi
+
+          if [ "${{ needs.config-validation.result }}" == "failure" ]; then
+            echo "Config validation failed"
+            exit 1
+          fi
+
+          if [ "${{ needs.iron-dome.result }}" == "failure" ]; then
+            echo "Iron Dome (type safety) failed"
+            exit 1
+          fi
+
+          if [ "${{ needs.mock-tax.result }}" == "failure" ]; then
+            echo "Mock Tax failed"
+            exit 1
+          fi
+
+          if [ "${{ needs.srp-guardrails.result }}" == "failure" ]; then
+            echo "SRP Guardrails failed"
+            exit 1
+          fi
+
+          if [ "${{ needs.mock-conformance.result }}" == "failure" ]; then
+            echo "Mock Conformance failed"
+            exit 1
+          fi
+
+          echo "All governance checks passed!"
+          echo ""
+          echo "Defense Grid Status:"
+          echo "  Layer 0 (Config):      ${{ needs.config-validation.result }}"
+          echo "  Layer 2 (Iron Dome):   ${{ needs.iron-dome.result }}"
+          echo "  Layer 3 (Mock Tax):    ${{ needs.mock-tax.result }}"
+          echo "  Layer 9 (SRP):         ${{ needs.srp-guardrails.result }}"
+          echo "  Layer 10 (Mock Conf):  ${{ needs.mock-conformance.result }}"
+          echo "  Pre-commit:            ${{ needs.pre-commit.result }}"

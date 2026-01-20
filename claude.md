@@ -225,3 +225,229 @@ Every system we design should:
 - Fit coherently into the larger story
 
 **The story is the roadmap. Define it completely. Then build it.**
+
+---
+
+## MANDATORY: Test-Driven Development (TDD)
+
+### The Iron Rule
+
+**NEVER write production code without a failing test first.**
+
+This is a 100% AI-coded project. Tests ARE the specification. Without tests, code is speculation.
+
+### The TDD Cycle
+
+```
+1. RED    - Write a failing test that defines the expected behavior
+2. GREEN  - Write the MINIMUM code to make the test pass
+3. REFACTOR - Clean up while tests protect you
+4. REPEAT
+```
+
+### Before Writing ANY Code
+
+Ask yourself:
+1. "What test would prove this feature works?"
+2. "What test would catch the bug I'm fixing?"
+3. "Have I written that test first?"
+
+If the answer to #3 is "no", STOP and write the test.
+
+---
+
+## The Testing Pyramid
+
+```
+                        +---------------------------+
+                        |     E2E Tests             |  <- Rare, expensive
+                        |   (Golden Spike only)     |
+                        +-------------+-------------+
+                                      |
+                    +-----------------+-----------------+
+                    |      Integration Tests            |  <- FastAPI TestClient
+                    |    (API endpoints, DB queries)    |
+                    +----------------+------------------+
+                                     |
+           +-------------------------+-------------------------+
+           |                    Unit Tests                     |  <- MOST tests here
+           |          (Pure Core - No I/O, No Mocks)           |
+           +-------------------------+-------------------------+
+                                     |
++--------------------------------------------------------------------+
+|                        Governance Layer                             |
+|          Iron Dome + Rising Tide + Mock Conformance                 |
++--------------------------------------------------------------------+
+```
+
+### Test Categories
+
+| Category | Location | What It Tests | I/O? |
+|----------|----------|---------------|------|
+| **Unit** | `tests/unit/` | Pure logic, Pydantic models | NO |
+| **Integration** | `tests/integration/` | API endpoints, services | TestClient only |
+| **E2E** | `tests/e2e/` | Full player workflows | Real DB/Redis |
+
+---
+
+## Pure Core Pattern (CRITICAL)
+
+### What is "Pure"?
+
+Pure code has NO:
+- Database calls (`db.query()`, `session.execute()`)
+- Network requests (`requests.get()`, `httpx.post()`)
+- File system operations (`open()`, `pathlib.Path().read_text()`)
+- FastAPI dependencies (`Request`, `Response`, `Depends`)
+- External service calls (Redis, message queues)
+
+Pure code ONLY has:
+- Function arguments (input)
+- Return values (output)
+- Pydantic models
+- Data transformations
+- Business logic calculations
+
+### Example: WRONG vs RIGHT
+
+**WRONG (Impure - Hard to Test):**
+```python
+class NoveltyScorer:
+    def calculate(self, event_id: str) -> float:
+        # BAD: Database call inside logic
+        event = self.db.query(TelemetryEvent).get(event_id)
+        if event.action in RARE_ACTIONS:
+            return 0.8
+        return 0.2
+```
+
+**RIGHT (Pure - Easy to Test):**
+```python
+class NoveltyScorer:
+    """Pure logic - no database, no network, no files."""
+
+    def calculate(self, event: TelemetryEvent) -> float:
+        # GOOD: Receives data, returns result
+        if event.action in RARE_ACTIONS:
+            return 0.8
+        return 0.2
+```
+
+---
+
+## Mock Conformance (CRITICAL)
+
+### The Rule
+
+**ALWAYS use `create_autospec()` instead of bare `Mock()`.**
+
+This is enforced by pre-commit hooks. Violations will be blocked.
+
+```python
+# BAD - Silent bugs
+mock = Mock()
+mock.nonexistent_method()  # Passes silently - BUG!
+
+# GOOD - Catches interface violations
+from unittest.mock import create_autospec
+mock = create_autospec(PolicyEngine, instance=True)
+mock.nonexistent_method()  # Raises AttributeError immediately
+```
+
+---
+
+## Governance Rules (Pre-commit Enforced)
+
+### 1. Iron Dome (Type Safety)
+
+Type safety ratchet - violations can only go DOWN:
+- No new `Any` annotations
+- No new `# type: ignore` comments
+- No new `cast()` calls
+
+### 2. Rising Tide (Mock Tax)
+
+Test files using mocks cannot exceed 2x the size of source:
+- Source: 100 lines → Test: max 200 lines
+- If exceeded, extract pure logic into separate file
+
+### 3. SRP Guardrails
+
+Single Responsibility Principle enforcement:
+- Files: warn at 300 lines, fail at 600 lines
+- Functions: max 75 lines
+
+### 4. Mock Conformance
+
+All mocks must use `create_autospec()`:
+- Bare `Mock()` is forbidden
+- `MagicMock()` is forbidden
+
+---
+
+## Code Style
+
+### Python (The Brain)
+
+- **Formatter:** Black (line-length: 100)
+- **Import sorter:** isort (profile: black)
+- **Linter:** Ruff
+- **Type checker:** mypy
+
+### Type Hints Required
+
+All new code MUST have type hints:
+
+```python
+# GOOD
+def calculate_payout(
+    events: list[TelemetryEvent],
+    multiplier: float = 1.0
+) -> PayoutResult:
+    ...
+
+# BAD
+def calculate_payout(events, multiplier=1.0):
+    ...
+```
+
+---
+
+## Running Tests
+
+```bash
+# All tests
+pytest
+
+# With coverage
+pytest --cov=gaian --cov-report=html
+
+# Only unit tests (fast)
+pytest tests/unit/
+
+# Pre-commit hooks
+pre-commit run --all-files
+```
+
+---
+
+## TDD Checklist (Before Every Commit)
+
+- [ ] Wrote failing test FIRST
+- [ ] Test uses `create_autospec()` for mocks
+- [ ] Pure logic extracted (no I/O in business logic)
+- [ ] All functions have type hints
+- [ ] `pre-commit run --all-files` passes
+- [ ] Test file < 2x source file size
+- [ ] No new `Any` or `type: ignore`
+
+---
+
+## Key Documentation
+
+| Document | Purpose |
+|----------|---------|
+| `docs/guides/development/TDD-GUIDE.md` | Full TDD philosophy and patterns |
+| `docs/guides/development/CICD.md` | CI/CD pipeline configuration |
+| `docs/guides/project setup/PRECOMMIT-SETUP.md` | Pre-commit hook setup |
+| `docs/guides/architecture/directory-structure.md` | Project organization |
