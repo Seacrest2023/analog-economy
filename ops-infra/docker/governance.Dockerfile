@@ -1,7 +1,7 @@
 # Core Governance Service Dockerfile
 # Analog Economy - The Brain
 
-FROM python:3.11-slim
+FROM python:3.14-slim
 
 LABEL maintainer="The Analog Economy <devops@analogeconomy.com>"
 LABEL description="Core Governance API with Gaian Engine"
