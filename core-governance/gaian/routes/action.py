@@ -13,6 +13,7 @@ This endpoint is the "Golden Spike" proving the pipeline works.
 import json
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 from uuid import uuid4
 
 from fastapi import APIRouter, HTTPException, status
@@ -204,7 +205,7 @@ async def list_action_types() -> dict[str, list[str]]:
     summary="List Base Rewards",
     description="Returns base SILA rewards for each action type.",
 )
-async def list_action_rewards() -> dict[str, dict[str, float]]:
+async def list_action_rewards() -> dict[str, Any]:
     """
     List base SILA rewards for each action type.
 

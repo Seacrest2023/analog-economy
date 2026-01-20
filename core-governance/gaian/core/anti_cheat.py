@@ -12,6 +12,7 @@ from typing import Any
 
 class CheatType(Enum):
     """Types of detected cheating behavior."""
+
     BOT_INPUT = "bot_input"
     PHYSICS_VIOLATION = "physics_violation"
     TELEPORT = "teleport"
@@ -24,6 +25,7 @@ class CheatType(Enum):
 @dataclass
 class AntiCheatResult:
     """Result of anti-cheat evaluation."""
+
     passed: bool
     flags: list[CheatType]
     confidence: float
@@ -63,11 +65,7 @@ class AntiCheat:
         # Player flag history
         self._player_flags: dict[str, int] = {}
 
-    def evaluate(
-        self,
-        telemetry: dict[str, Any],
-        player_id: str
-    ) -> AntiCheatResult:
+    def evaluate(self, telemetry: dict[str, Any], player_id: str) -> AntiCheatResult:
         """
         Evaluate telemetry for cheating indicators.
 
@@ -78,8 +76,8 @@ class AntiCheat:
         Returns:
             AntiCheatResult with pass/fail and flag details
         """
-        flags = []
-        details = {}
+        flags: list[CheatType] = []
+        details: dict[str, str] = {}
 
         # TODO: Implement full anti-cheat evaluation
         # 1. Physics validation
@@ -107,10 +105,7 @@ class AntiCheat:
         confidence = 1.0 - (len(flags) * 0.2)  # Decrease confidence with each flag
 
         return AntiCheatResult(
-            passed=len(flags) == 0,
-            flags=flags,
-            confidence=max(0.0, confidence),
-            details=details
+            passed=len(flags) == 0, flags=flags, confidence=max(0.0, confidence), details=details
         )
 
     def _check_physics_violation(self, telemetry: dict[str, Any]) -> bool:

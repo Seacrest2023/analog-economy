@@ -12,6 +12,7 @@ from typing import Any
 
 class EthicsViolationType(Enum):
     """Categories of ethics violations."""
+
     TERROR_INSTRUCTION = "terror_instruction"
     BIOWEAPON_SYNTHESIS = "bioweapon_synthesis"
     CHILD_HARM = "child_harm"
@@ -26,6 +27,7 @@ class EthicsViolationType(Enum):
 @dataclass
 class EthicsResult:
     """Result of ethics evaluation."""
+
     passed: bool
     violations: list[EthicsViolationType]
     severity: str  # "none", "warning", "critical"
@@ -63,11 +65,7 @@ class EthicsFilter:
             "surveillance_enhancement": self.config.get("surveillance_enhancement", False),
         }
 
-    def evaluate(
-        self,
-        telemetry: dict[str, Any],
-        biome_config: dict[str, Any]
-    ) -> EthicsResult:
+    def evaluate(self, telemetry: dict[str, Any], biome_config: dict[str, Any]) -> EthicsResult:
         """
         Evaluate telemetry against ethics rules.
 
@@ -78,7 +76,7 @@ class EthicsFilter:
         Returns:
             EthicsResult with pass/fail and violation details
         """
-        violations = []
+        violations: list[EthicsViolationType] = []
 
         # TODO: Implement ethics violation detection
         # This will involve NLP analysis, pattern matching,
@@ -88,12 +86,7 @@ class EthicsFilter:
         # Apply biome-specific tightening (never loosening)
 
         if not violations:
-            return EthicsResult(
-                passed=True,
-                violations=[],
-                severity="none",
-                details={}
-            )
+            return EthicsResult(passed=True, violations=[], severity="none", details={})
 
         severity = self._calculate_severity(violations)
 
@@ -101,7 +94,7 @@ class EthicsFilter:
             passed=False,
             violations=violations,
             severity=severity,
-            details={"biome_ethics_level": biome_config.get("ethics_level", "normal")}
+            details={"biome_ethics_level": biome_config.get("ethics_level", "normal")},
         )
 
     def _calculate_severity(self, violations: list[EthicsViolationType]) -> str:

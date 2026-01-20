@@ -44,11 +44,7 @@ app.add_middleware(
 @app.get("/")
 async def root():
     """Root endpoint - health check."""
-    return {
-        "name": APP_NAME,
-        "version": APP_VERSION,
-        "status": "operational"
-    }
+    return {"name": APP_NAME, "version": APP_VERSION, "status": "operational"}
 
 
 @app.get("/health")
@@ -60,8 +56,8 @@ async def health_check():
             "api": "operational",
             "gaian": "operational",
             "database": "not_configured",
-            "ml_pipeline": "not_configured"
-        }
+            "ml_pipeline": "not_configured",
+        },
     }
 
 
@@ -74,4 +70,5 @@ async def health_check():
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

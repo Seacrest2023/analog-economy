@@ -16,6 +16,7 @@ from pendulum import DateTime
 @dataclass
 class BuyerPackage:
     """A packaged dataset ready for buyer delivery."""
+
     package_id: str
     buyer_id: str
     biome_id: str
@@ -45,11 +46,7 @@ class BuyerPackageBuilder:
         self.encryption_standard = config.get("encryption_standard", "AES-256")
 
     def build_package(
-        self,
-        data: list[dict[str, Any]],
-        buyer_id: str,
-        biome_id: str,
-        format: str = "parquet"
+        self, data: list[dict[str, Any]], buyer_id: str, biome_id: str, format: str = "parquet"
     ) -> BuyerPackage:
         """
         Build a data package for a specific buyer.
@@ -78,14 +75,11 @@ class BuyerPackageBuilder:
             buyer_id=buyer_id,
             biome_id=biome_id,
             record_count=len(data),
-            created_at=pendulum.now('UTC'),
+            created_at=pendulum.now("UTC"),
             format=format,
             encryption=self.encryption_standard,
             checksum="TODO_IMPLEMENT_CHECKSUM",
-            metadata={
-                "version": "1.0",
-                "schema": "analog_economy_v1"
-            }
+            metadata={"version": "1.0", "schema": "analog_economy_v1"},
         )
 
     def anonymize(self, data: list[dict[str, Any]], rules: dict[str, Any]) -> list[dict[str, Any]]:

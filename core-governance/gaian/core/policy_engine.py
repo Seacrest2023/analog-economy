@@ -55,7 +55,8 @@ class PolicyEngine:
 
         if config_path.exists():
             with open(config_path) as f:
-                return yaml.safe_load(f)
+                result = yaml.safe_load(f)
+                return result if isinstance(result, dict) else {}
 
         return {}
 
@@ -78,7 +79,7 @@ class PolicyEngine:
         if not self._initialized:
             self.initialize()
 
-        reasons = []
+        reasons: list[str] = []
 
         # TODO: Implement full policy evaluation chain
         # 1. Anti-cheat validation
@@ -95,5 +96,6 @@ class PolicyEngine:
 
     def get_biome_config(self, biome_id: str) -> dict[str, Any]:
         """Get configuration for a specific biome."""
-        biomes = self.config.get("biomes", {})
-        return biomes.get(biome_id, {})
+        biomes: dict[str, Any] = self.config.get("biomes", {})
+        result = biomes.get(biome_id, {})
+        return result if isinstance(result, dict) else {}

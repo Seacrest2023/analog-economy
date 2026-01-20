@@ -12,6 +12,7 @@ from typing import Any
 @dataclass
 class BiomeContext:
     """Context information for biome rule evaluation."""
+
     biome_id: str
     ethics_level: str  # "normal", "elevated", "high", "maximum"
     classification: str  # "STANDARD", "SENSITIVE", "RESTRICTED", "CRITICAL"
@@ -47,7 +48,7 @@ class BaseBiome(ABC):
             biome_id=self.biome_id,
             ethics_level=self.ethics_level,
             classification=self.classification,
-            special_rules=self.special_rules
+            special_rules=self.special_rules,
         )
 
     @abstractmethod
