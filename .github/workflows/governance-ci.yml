@@ -28,6 +28,7 @@ on:
       - '.governance/**'
       - 'pyproject.toml'
       - 'CLAUDE.md'
+      - '.github/workflows/**'
   # NOTE: No push trigger - all changes go through PRs
   # See CLAUDE.md "Git Workflow" section for the required process
 
